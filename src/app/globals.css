@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dynamic-height-container {
+  min-height: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dynamic-height-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f2f3f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5b06be;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a05a0;
+}
+
+/* Firefox Scrollbar Styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #5b06be #f2f3f8;
+}
+
+/* Scrollable container class */
+.scrollable-content {
+  padding-right: 4px;
+  margin-right: -4px;
+}
+
