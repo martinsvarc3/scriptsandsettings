@@ -1,13 +1,7 @@
 'use client'
 
 import { useState, useCallback, ChangeEvent, DragEvent } from 'react'
-import dynamic from 'next/dynamic'
 import { Upload } from 'lucide-react'
-
-// Dynamically import mammoth to avoid server-side loading issues
-const mammoth = dynamic(() => import('mammoth'), {
-  ssr: false
-})
 
 interface DocumentUploaderProps {
   onUpload: (content: string, fileName: string) => void
@@ -28,9 +22,9 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
       if (file.type === 'text/plain') {
         content = await file.text()
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        const mammothModule = await import('mammoth')
+        const mammoth = await import('mammoth')
         const arrayBuffer = await file.arrayBuffer()
-        const result = await mammothModule.convertToHtml({ arrayBuffer }, {
+        const result = await mammoth.convertToHtml({ arrayBuffer }, {
           preserveEmptyParagraphs: true,
           styleMap: [
             "p[style-name='Normal'] => p:fresh",
