@@ -200,24 +200,33 @@ export default function ScriptUploader() {
   };
 
   return (
-    <div className="w-full max-w-[600px] bg-white rounded-[20px] overflow-hidden flex flex-col px-3 sm:px-5 h-full">
-      <div className="py-2 sm:py-3 flex flex-col flex-grow overflow-y-auto min-h-[calc(100vh-200px)]">
-        <Header step={step} selectedCategory={selectedCategory} isUploadMode={!!uploadedContent} selectedTemplate={!!selectedTemplate} />
-        <div className="mt-1 sm:mt-2 flex flex-col space-y-2">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-[20px] p-3 flex items-center text-red-600">
-              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-montserrat">{error}</span>
-            </div>
-          )}
-          {step === 1 && (
-            <div className="mt-1 w-full flex-grow flex items-center justify-center px-4 py-8">
-              <CategorySelector
-                onSelect={handleCategorySelect}
-                categoryData={categoryData}
-              />
-            </div>
-          )}
+  <div className="w-full max-w-[600px] bg-white rounded-[20px] overflow-hidden flex flex-col px-3 sm:px-5 h-full">
+    <div className="py-2 sm:py-3 flex flex-col flex-grow overflow-y-auto min-h-[calc(100vh-200px)]">
+      <Header 
+        step={step}
+        selectedCategory={selectedCategory}
+        isUploadMode={!!uploadedContent}
+        selectedTemplate={!!selectedTemplate}
+      />
+
+      <div className="mt-1 sm:mt-2 flex flex-col space-y-2">
+        {/* Error Message Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-[20px] p-3 flex items-center text-red-600">
+            <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+            <span className="text-xs sm:text-sm font-montserrat">{error}</span>
+          </div>
+        )}
+
+        {/* Step 1: Category Selection */}
+        {step === 1 && (
+          <div className="mt-1 w-full flex-grow flex items-center justify-center px-4 py-8">
+            <CategorySelector
+              onSelect={handleCategorySelect}
+              categoryData={categoryData}
+            />
+          </div>
+        )}
           {step === 2 && (
             <>
               <ScriptActions
