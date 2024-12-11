@@ -2,7 +2,6 @@
 
 import { useState, useCallback, ChangeEvent, DragEvent } from 'react'
 import { Upload } from 'lucide-react'
-import type { Options as MammothOptions } from 'mammoth'
 
 interface DocumentUploaderProps {
   onUpload: (content: string, fileName: string) => void
@@ -26,7 +25,6 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
         const mammoth = await import('mammoth')
         const arrayBuffer = await file.arrayBuffer()
         const result = await mammoth.convertToHtml({ arrayBuffer }, {
-          ignoreEmptyParagraphs: false,
           styleMap: [
             "p[style-name='Normal'] => p:fresh",
             "p[style-name='Heading 1'] => h1:fresh",
@@ -43,7 +41,7 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
           ]
         })
 
-        if (result.messages.length > 0) {
+        if (result.messages && result.messages.length > 0) {
           console.warn('Mammoth conversion messages:', result.messages)
         }
 
