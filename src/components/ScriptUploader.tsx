@@ -311,11 +311,16 @@ const handleSelectScript = async (scriptId: string) => {
 
         <div className="mt-1 sm:mt-2 flex flex-col space-y-2">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-[20px] p-3 flex items-center text-red-600">
-              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-montserrat">{error}</span>
-            </div>
-          )}
+  <div className="bg-red-50 border border-red-200 rounded-[20px] p-3 flex items-center text-red-600">
+    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+    <div className="flex flex-col">
+      <span className="text-xs sm:text-sm font-montserrat">{error}</span>
+      <span className="text-xs text-red-400 mt-1">
+        URL Parameters: {window.location.search}
+      </span>
+    </div>
+  </div>
+)}
 
           {step === 1 && (
             <div className="mt-1 w-full flex-grow flex items-center justify-center px-4 py-8">
