@@ -19,3 +19,9 @@ export interface CategoryData {
   scripts: SavedScript[]
 }
 
+export interface HeaderProps {
+  step: number
+  selectedCategory: Category | null
+  isUploadMode: boolean
+  selectedTemplate: boolean
+}
