@@ -2,6 +2,7 @@
 
 import { useState, useCallback, ChangeEvent, DragEvent } from 'react'
 import { Upload } from 'lucide-react'
+import type { Options as MammothOptions } from 'mammoth'
 
 interface DocumentUploaderProps {
   onUpload: (content: string, fileName: string) => void
@@ -25,7 +26,7 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
         const mammoth = await import('mammoth')
         const arrayBuffer = await file.arrayBuffer()
         const result = await mammoth.convertToHtml({ arrayBuffer }, {
-          preserveEmptyParagraphs: true,
+          ignoreEmptyParagraphs: false,
           styleMap: [
             "p[style-name='Normal'] => p:fresh",
             "p[style-name='Heading 1'] => h1:fresh",
@@ -41,6 +42,11 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
             "td => td.docx-td"
           ]
         })
+
+        if (result.messages.length > 0) {
+          console.warn('Mammoth conversion messages:', result.messages)
+        }
+
         content = result.value
       } else if (file.type === 'application/pdf') {
         content = `Content of PDF file "${file.name}". (PDF content extraction is not supported in this demo.)`
@@ -51,7 +57,7 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
       onUpload(content, file.name)
     } catch (err) {
       setError('Error processing file. Please try again.')
-      console.error(err)
+      console.error('File processing error:', err)
     } finally {
       setIsLoading(false)
     }
