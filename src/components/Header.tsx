@@ -1,13 +1,6 @@
 'use client'
-
 import Image from 'next/image'
-
-interface HeaderProps {
-  step: number
-  selectedCategory?: string
-  isUploadMode?: boolean
-  selectedTemplate?: boolean
-}
+import { Category, HeaderProps } from '@/types'
 
 export default function Header({ 
   step, 
