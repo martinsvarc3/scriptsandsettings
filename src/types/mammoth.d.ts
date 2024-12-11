@@ -1,16 +1,18 @@
 declare module 'mammoth' {
-  interface Options {
+  interface ConversionOptions {
     styleMap?: string[];
   }
   
-  interface Result {
+  interface ConversionResult {
     value: string;
     messages: Array<{
       type: string;
       message: string;
-      // Add other properties as needed
     }>;
   }
 
-  function convertToHtml(input: { arrayBuffer: ArrayBuffer }, options?: Options): Promise<Result>;
+  export function convertToHtml(
+    input: { arrayBuffer: ArrayBuffer }, 
+    options?: ConversionOptions
+  ): Promise<ConversionResult>;
 }
