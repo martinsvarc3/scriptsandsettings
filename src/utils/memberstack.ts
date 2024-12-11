@@ -1,34 +1,24 @@
-declare global {
-  interface Window {
-    $memberstackDom: {
-      getCurrentMember: () => Promise<{
-        data: {
-          id: string;
-          customFields: {
-            tid: string;
-          };
-          metaData: Record<string, any>;
-        };
-      }>;
-    };
-  }
-}
-
 export async function getMemberData() {
   try {
-    const memberstack = window.$memberstackDom;
-    if (!memberstack) {
-      throw new Error('Memberstack not initialized');
-    }
+    // Get IDs from URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const memberstackId = params.get('memberId');
+    const teamId = params.get('teamId');
 
-    const { data: member } = await memberstack.getCurrentMember();
-    if (!member) {
-      throw new Error('No member found');
+    console.log('URL Parameters:', {
+      memberstackId,
+      teamId,
+      fullUrl: window.location.href
+    });
+
+    if (!memberstackId || !teamId) {
+      console.error('Missing IDs in URL:', window.location.search);
+      throw new Error('Missing member or team ID in URL');
     }
 
     return {
-      memberstackId: member.id,
-      teamId: member.customFields.tid
+      memberstackId,
+      teamId
     };
   } catch (error) {
     console.error('Error getting member data:', error);
