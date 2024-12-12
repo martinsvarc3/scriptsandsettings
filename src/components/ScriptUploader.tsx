@@ -150,25 +150,17 @@ export default function ScriptUploader() {
       setError('Unable to save script. Please try again.')
       return
     }
+
     setIsLoading(true)
     try {
       const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
-      // Here's the key change - only create new script if not editing
-      let savedScript;
-      if (editingScript) {
-        savedScript = await scriptService.updateScript(editingScript.id, teamId, {
-          name: scriptName,
-          content
-        })
-      } else {
-        savedScript = await scriptService.createScript(
-          teamId,
-          memberId,
-          scriptName,
-          content,
-          selectedCategory
-        )
-      }
+      const savedScript = await scriptService.createScript(
+        teamId,
+        memberId,
+        scriptName,
+        content,
+        selectedCategory
+      )
 
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
