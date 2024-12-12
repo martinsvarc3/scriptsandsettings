@@ -152,21 +152,25 @@ const handleScriptSave = async (content: string) => {
     }
     setIsLoading(true)
     try {
+      console.log('Editing script?:', !!editingScript) // Debug log
+      console.log('Editing script details:', editingScript) // Debug log
+      
       let savedScript;
       const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
       
-      if (editingScript) {
-        // Update existing script
+      if (editingScript && editingScript.id) {
+        console.log('Updating existing script with ID:', editingScript.id) // Debug log
         savedScript = await scriptService.updateScript(
           editingScript.id,
           teamId,
           {
             content,
-            name: scriptName
+            name: scriptName,
+            category: selectedCategory
           }
         )
       } else {
-        // Create new script
+        console.log('Creating new script') // Debug log
         savedScript = await scriptService.createScript(
           teamId,
           memberId,
@@ -176,15 +180,19 @@ const handleScriptSave = async (content: string) => {
         )
       }
 
+      console.log('Saved script response:', savedScript) // Debug log
+
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
         if (categoryIndex !== -1) {
           const newData = [...prev]
-          if (editingScript) {
+          if (editingScript && editingScript.id) {
+            console.log('Updating script in category data') // Debug log
             newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
               script.id === editingScript.id ? savedScript : script
             )
           } else {
+            console.log('Adding new script to category data') // Debug log
             newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
           }
           return newData
