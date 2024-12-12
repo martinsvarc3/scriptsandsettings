@@ -145,22 +145,36 @@ export default function ScriptUploader() {
     setHistory([...history, 3])
   }
 
-  const handleScriptSave = async (content: string) => {
+const handleScriptSave = async (content: string) => {
     if (!teamId || !memberId || !selectedCategory) {
       setError('Unable to save script. Please try again.')
       return
     }
-
     setIsLoading(true)
     try {
+      let savedScript;
       const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
-      const savedScript = await scriptService.createScript(
-        teamId,
-        memberId,
-        scriptName,
-        content,
-        selectedCategory
-      )
+      
+      if (editingScript) {
+        // Update existing script
+        savedScript = await scriptService.updateScript(
+          editingScript.id,
+          teamId,
+          {
+            content,
+            name: scriptName
+          }
+        )
+      } else {
+        // Create new script
+        savedScript = await scriptService.createScript(
+          teamId,
+          memberId,
+          scriptName,
+          content,
+          selectedCategory
+        )
+      }
 
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
