@@ -145,31 +145,22 @@ export default function ScriptUploader() {
     setHistory([...history, 3])
   }
 
-const handleScriptSave = async (content: string) => {
+  const handleScriptSave = async (content: string) => {
     if (!teamId || !memberId || !selectedCategory) {
       setError('Unable to save script. Please try again.')
       return
     }
     setIsLoading(true)
     try {
-      console.log('Editing script?:', !!editingScript)
-      console.log('Editing script details:', editingScript)
-      
-      let savedScript;
       const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
-      
-      if (editingScript && editingScript.id) {
-        console.log('Updating existing script with ID:', editingScript.id)
-        savedScript = await scriptService.updateScript(
-          editingScript.id,
-          teamId,
-          {
-            content,
-            name: scriptName
-          }
-        )
+      // Here's the key change - only create new script if not editing
+      let savedScript;
+      if (editingScript) {
+        savedScript = await scriptService.updateScript(editingScript.id, teamId, {
+          name: scriptName,
+          content
+        })
       } else {
-        console.log('Creating new script')
         savedScript = await scriptService.createScript(
           teamId,
           memberId,
@@ -179,19 +170,15 @@ const handleScriptSave = async (content: string) => {
         )
       }
 
-      console.log('Saved script response:', savedScript)
-
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
         if (categoryIndex !== -1) {
           const newData = [...prev]
-          if (editingScript && editingScript.id) {
-            console.log('Updating script in category data')
+          if (editingScript) {
             newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
               script.id === editingScript.id ? savedScript : script
             )
           } else {
-            console.log('Adding new script to category data')
             newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
           }
           return newData
@@ -332,16 +319,11 @@ const handleSelectScript = async (scriptId: string) => {
 
         <div className="mt-1 sm:mt-2 flex flex-col space-y-2">
           {error && (
-  <div className="bg-red-50 border border-red-200 rounded-[20px] p-3 flex items-center text-red-600">
-    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
-    <div className="flex flex-col">
-      <span className="text-xs sm:text-sm font-montserrat">{error}</span>
-      <span className="text-xs text-red-400 mt-1">
-        URL Parameters: {window.location.search}
-      </span>
-    </div>
-  </div>
-)}
+            <div className="bg-red-50 border border-red-200 rounded-[20px] p-3 flex items-center text-red-600">
+              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-montserrat">{error}</span>
+            </div>
+          )}
 
           {step === 1 && (
             <div className="mt-1 w-full flex-grow flex items-center justify-center px-4 py-8">
