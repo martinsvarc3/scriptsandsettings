@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { motion } from "framer-motion"
 import Image from 'next/image'
 import { Info } from 'lucide-react'
+import { getMemberData } from "@/utils/memberstack"
 
 type TargetType = {
   name: string;
@@ -20,38 +21,101 @@ const targetTypes: TargetType[] = [
   { name: "Call length", min: 5, max: 30, unit: "minutes" }
 ]
 
-
 export default function SetCallTargetsModal() {
   const [activeCategory] = useState<'intermediate' | 'expert'>('intermediate')
   const [targets, setTargets] = useState(targetTypes.map(() => ""))
-  const [showInfo, setShowInfo] = useState<number | null>(null);
-  const popupRef = useRef<HTMLDivElement>(null);
+  const [showInfo, setShowInfo] = useState<number | null>(null)
+  const [teamId, setTeamId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const popupRef = useRef<HTMLDivElement>(null)
+
+  // Initialize team data
+  useEffect(() => {
+    const initializeMemberData = async () => {
+      try {
+        const { teamId } = await getMemberData()
+        setTeamId(teamId)
+        
+        // Fetch existing goals if any
+        if (teamId) {
+          const response = await fetch(`/api/performance-goals?teamId=${teamId}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data) {
+              setTargets([
+                data.overall_performance_goal.toString(),
+                data.number_of_calls_average.toString(),
+                targets[2] // Preserve call length value
+              ])
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Member data error:', err)
+        setError('Error loading member data. Please refresh the page.')
+      }
+    }
+
+    initializeMemberData()
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-        setShowInfo(null);
+        setShowInfo(null)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Submitted targets:", { [activeCategory]: targets })
-    // Here you would typically send the data to your backend or perform other actions
+    if (!teamId) {
+      setError('Team ID not available. Please refresh the page.')
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/performance-goals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          teamId,
+          overall_performance_goal: Number(targets[0]),
+          number_of_calls_average: Number(targets[1])
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save targets')
+      }
+
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    } catch (err) {
+      console.error('Error saving targets:', err)
+      setError('Failed to save targets. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-
   const getGradientColor = (value: number) => {
-    if (value < 50) return 'from-[#50c2aa] to-[#50c2aa]';
-    if (value < 80) return 'from-[#f8b923] to-[#f8b923]';
-    return 'from-[#ff0000] to-[#ff0000]';
-  };
+    if (value < 50) return 'from-[#50c2aa] to-[#50c2aa]'
+    if (value < 80) return 'from-[#f8b923] to-[#f8b923]'
+    return 'from-[#ff0000] to-[#ff0000]'
+  }
 
   const updateTargets = (index: number, value: string) => {
     const newTargets = [...targets]
@@ -100,7 +164,7 @@ export default function SetCallTargetsModal() {
                 max={target.max}
                 value={targets[index] || target.min}
                 onChange={(e) => {
-                  updateTargets(index, e.target.value);
+                  updateTargets(index, e.target.value)
                 }}
                 className="absolute inset-0 w-full h-full appearance-none bg-transparent focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb]:ease-in-out [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-300 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:ease-in-out [&::-moz-range-thumb]:hover:scale-110"
               />
@@ -149,14 +213,25 @@ export default function SetCallTargetsModal() {
       >
         <div className="flex flex-col">
           <div className="py-2 sm:py-3 px-8">
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+            {saveSuccess && (
+              <div className="mb-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm">
+                Targets saved successfully!
+              </div>
+            )}
             {renderTargetInputs()}
           </div>
           <div className="p-8 border-t flex justify-center mt-auto">
             <Button
               onClick={handleSubmit}
+              disabled={isLoading}
               className="bg-white text-black hover:bg-gray-50 px-6 h-[45px] rounded-[20px] text-lg font-semibold shadow-lg transition-all duration-200 hover:scale-[1.02] w-full max-w-xs border-2"
             >
-              Save Targets
+              {isLoading ? 'Saving...' : 'Save Targets'}
             </Button>
           </div>
         </div>
@@ -164,4 +239,3 @@ export default function SetCallTargetsModal() {
     </div>
   )
 }
-
