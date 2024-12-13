@@ -21,7 +21,7 @@ const targetTypes: TargetType[] = [
   { name: "Call length", min: 5, max: 30, unit: "minutes" }
 ]
 
-export default function SetCallTargetsModal({ onReady }: { onReady: () => void }) {
+export default function SetCallTargetsModal() {
   const [activeCategory] = useState<'intermediate' | 'expert'>('intermediate')
   const [targets, setTargets] = useState(targetTypes.map(() => ""))
   const [showInfo, setShowInfo] = useState<number | null>(null)
@@ -52,16 +52,14 @@ export default function SetCallTargetsModal({ onReady }: { onReady: () => void }
             }
           }
         }
-        onReady() // Signal that this component is ready
       } catch (err) {
         console.error('Member data error:', err)
         setError('Error loading member data. Please refresh the page.')
-        onReady() // Still signal ready even if there's an error
       }
     }
 
     initializeMemberData()
-  }, [onReady])
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
