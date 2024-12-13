@@ -136,7 +136,7 @@ export default function SetCallTargetsModal() {
             </Label>
             <div className="relative">
               <Info
-                className="w-4 h-4 text-[#000000] cursor-pointer"
+                className="w-4 h-4 text-[#5b06be] cursor-pointer"
                 onClick={() => setShowInfo(index)}
               />
               {showInfo === index && (
