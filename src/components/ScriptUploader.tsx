@@ -97,16 +97,47 @@ export default function ScriptUploader() {
     loadScripts()
   }, [selectedCategory, teamId, memberId])
 
-  const handleCategorySelect = (category: Category) => {
-    setSelectedCategory(category)
-    const categoryScripts = categoryData.find(data => data.category === category)?.scripts || []
-    if (categoryScripts.length > 0) {
+  const handleCategorySelect = async (category: Category) => {
+  setSelectedCategory(category)
+  setIsLoading(true)
+  
+  try {
+    if (!teamId || !memberId) {
+      throw new Error('Missing required data')
+    }
+
+    // Fetch scripts immediately when category is selected
+    const scripts = await scriptService.getScripts(teamId, memberId, category)
+    
+    // Update category data
+    setCategoryData(prev => {
+      const existingCategoryIndex = prev.findIndex(data => data.category === category)
+      if (existingCategoryIndex !== -1) {
+        const newData = [...prev]
+        newData[existingCategoryIndex] = {
+          category: category,
+          scripts
+        }
+        return newData
+      }
+      return [...prev, { category: category, scripts }]
+    })
+
+    // Now we can check the scripts length and set the appropriate step
+    if (scripts.length > 0) {
       setStep(5)
     } else {
       setStep(2)
     }
     setHistory([...history, step])
+    
+  } catch (err) {
+    setError('Error loading scripts. Please try again.')
+    console.error('Script loading error:', err)
+  } finally {
+    setIsLoading(false)
   }
+}
 
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template)
