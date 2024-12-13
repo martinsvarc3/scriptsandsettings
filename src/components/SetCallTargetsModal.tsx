@@ -21,7 +21,7 @@ const targetTypes: TargetType[] = [
   { name: "Call length", min: 5, max: 30, unit: "minutes" }
 ]
 
-export default function SetCallTargetsModal() {
+export default function SetCallTargetsModal({ onReady }: { onReady: () => void }) {
   const [activeCategory] = useState<'intermediate' | 'expert'>('intermediate')
   const [targets, setTargets] = useState(targetTypes.map(() => ""))
   const [showInfo, setShowInfo] = useState<number | null>(null)
