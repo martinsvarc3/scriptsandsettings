@@ -147,13 +147,13 @@ const handleScriptSave = async (content: string) => {
 
   setIsLoading(true)
   try {
-    let scriptName = 'New Script'
+    let scriptName: string
     if (selectedTemplate) {
       scriptName = selectedTemplate.title
     } else if (editingScript) {
       scriptName = editingScript.name
-    } else if (uploadedContent) {
-      scriptName = editingScript?.name || 'Uploaded Script'
+    } else {
+      scriptName = 'Uploaded Script'
     }
 
     let savedScript
