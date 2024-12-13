@@ -44,17 +44,16 @@ export default function Home() {
     return <LoadingSpinner />
   }
 
-return (
-  <main className="min-h bg-[#f2f3f8] flex items-center justify-center py-2">
-    <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-3 justify-center items-stretch px-3">
-      <div className="w-full lg:w-1/2 flex justify-center">
-        <ScriptUploader />
+  return (
+    <main className="min-h bg-[#f2f3f8] flex items-center justify-center py-2">
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-3 justify-center items-stretch px-3">
+        <div className="w-full lg:w-1/2 flex justify-center">
+          <ScriptUploader />
+        </div>
+        <div className="w-full lg:w-1/2 flex justify-center">
+          <SetCallTargetsModal />
+        </div>
       </div>
-      <div className="w-full lg:w-1/2 flex justify-center">
-        <SetCallTargetsModal />
-      </div>
-    </div>
-  </main>
-)
+    </main>
   )
 }
