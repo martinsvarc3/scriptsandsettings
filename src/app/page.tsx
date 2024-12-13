@@ -45,8 +45,8 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f2f3f8] flex items-center justify-center p-2">
-      <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-10 justify-center items-stretch p-3">
+    <main className="min-h-screen bg-[#f2f3f8] flex items-center justify-center p-3">
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-7 justify-center items-stretch p-3">
         <div className="w-full lg:w-1/2 flex justify-center">
           <ScriptUploader />
         </div>
