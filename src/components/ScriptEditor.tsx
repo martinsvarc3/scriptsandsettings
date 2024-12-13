@@ -137,16 +137,18 @@ export default function ScriptEditor({
             hasChanges={hasChanges}
           />
           <div
-            ref={editorRef}
-            contentEditable
-            onInput={handleInput}
-            onPaste={handlePaste}
-            className="scrollable-content w-full min-h-[300px] px-6 pt-4 pb-6 font-montserrat text-sm md:text-xs sm:text-xs text-gray-800 focus:outline-none overflow-y-auto
-              [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4
-              [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3
-              [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mb-2
-              [&_p]:mb-4 [&_p]:last:mb-0"
-          />
+  ref={editorRef}
+  contentEditable
+  onInput={handleInput}
+  onPaste={handlePaste}
+  className="scrollable-content w-full h-[calc(100vh-350px)] px-6 pt-4 pb-6 font-montserrat text-sm md:text-xs sm:text-xs text-gray-800 focus:outline-none overflow-y-auto
+    [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4
+    [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3
+    [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mb-2
+    [&_p]:mb-4 [&_p]:last:mb-0
+    scrollbar-thin scrollbar-thumb-[#5b06be] scrollbar-track-transparent hover:scrollbar-thumb-[#5b06be]/80
+    scrollbar-corner-transparent"
+/>
         </div>
       </div>
       <div className="flex items-center justify-between px-4">
