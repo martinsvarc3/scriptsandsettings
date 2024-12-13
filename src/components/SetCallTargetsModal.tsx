@@ -52,14 +52,16 @@ export default function SetCallTargetsModal() {
             }
           }
         }
+        onReady() // Signal that this component is ready
       } catch (err) {
         console.error('Member data error:', err)
         setError('Error loading member data. Please refresh the page.')
+        onReady() // Still signal ready even if there's an error
       }
     }
 
     initializeMemberData()
-  }, [])
+  }, [onReady])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
