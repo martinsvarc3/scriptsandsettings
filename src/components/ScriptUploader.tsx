@@ -135,8 +135,13 @@ export default function ScriptUploader() {
 
   const handleUploadScript = async (content: string, fileName: string) => {
   setUploadedContent(content)
-  setUploadedFileName(fileName)
-  setEditingScript(null)
+  setEditingScript({
+    id: Date.now().toString(),
+    name: fileName,
+    content: content,
+    lastEdited: new Date().toISOString(),
+    isSelected: false
+  })
   setStep(3)
   setHistory([...history, 3])
 }
@@ -149,19 +154,11 @@ const handleScriptSave = async (content: string) => {
 
   setIsLoading(true)
   try {
-    let scriptName: string
-if (selectedTemplate) {
-  scriptName = selectedTemplate.title
-} else if (editingScript) {
-  scriptName = editingScript.name
-} else if (uploadedFileName) {
-  scriptName = uploadedFileName
-} else {
-  scriptName = 'Uploaded Script'
-}
-
+    const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
     let savedScript
-    if (editingScript?.id) {
+
+    // Check if we're editing an existing script (one with a real database ID)
+    if (editingScript?.id && editingScript.id.length > 13) { // Real DB IDs are longer than timestamp IDs
       // Update existing script
       savedScript = await scriptService.updateScript(
         editingScript.id,
@@ -174,7 +171,7 @@ if (selectedTemplate) {
         }
       )
     } else {
-      // Create new script (either from template or upload)
+      // Create new script
       savedScript = await scriptService.createScript(
         teamId,
         memberId,
@@ -184,13 +181,12 @@ if (selectedTemplate) {
       )
     }
 
-    // Update the category data
     setCategoryData(prev => {
       const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
       if (categoryIndex !== -1) {
         const newData = [...prev]
-        if (editingScript?.id) {
-          // Replace existing script
+        if (editingScript?.id && editingScript.id.length > 13) {
+          // Update existing script
           newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
             script.id === editingScript.id ? savedScript : script
           )
@@ -208,14 +204,13 @@ if (selectedTemplate) {
 
     setIsSaved(true)
     setTimeout(() => {
-  setStep(1)
-  setSelectedCategory(null)
-  setSelectedTemplate(null)
-  setUploadedContent(null)
-  setUploadedFileName(null)
-  setEditingScript(null)
-  setHistory([1])
-}, 1500)
+      setStep(1)
+      setSelectedCategory(null)
+      setSelectedTemplate(null)
+      setUploadedContent(null)
+      setEditingScript(null)
+      setHistory([1])
+    }, 1500)
   } catch (err) {
     setError('Error saving script. Please try again.')
     console.error('Script saving error:', err)
