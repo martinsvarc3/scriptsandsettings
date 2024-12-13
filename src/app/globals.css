@@ -14,7 +14,7 @@
   overflow-y: auto;
 }
 
-/* Custom Scrollbar Styles */
+/* Global scrollbar styles */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -39,9 +39,37 @@
   scrollbar-color: #5b06be #f2f3f8;
 }
 
-/* Scrollable container class */
-.scrollable-content {
-  padding-right: 4px;
-  margin-right: -4px;
+/* Custom scrollbar for the editor content */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #5b06be;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4a05a0;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #5b06be transparent;
+}
+
+/* Scrollable container class */
+.scrollable-content {
+  padding-right: 8px; /* Increased to account for wider scrollbar */
+  margin-right: -8px;
+}
