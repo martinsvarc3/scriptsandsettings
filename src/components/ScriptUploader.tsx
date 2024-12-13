@@ -133,17 +133,11 @@ export default function ScriptUploader() {
   }
 
   const handleUploadScript = async (content: string, fileName: string) => {
-    setUploadedContent(content)
-    setEditingScript({
-      id: Date.now().toString(),
-      name: fileName,
-      content: content,
-      lastEdited: new Date().toISOString(),
-      isSelected: false
-    })
-    setStep(3)
-    setHistory([...history, 3])
-  }
+  setUploadedContent(content)
+  setEditingScript(null) // Clear any editing state
+  setStep(3)
+  setHistory([...history, 3])
+}
 
 const handleScriptSave = async (content: string) => {
   if (!teamId || !memberId || !selectedCategory) {
@@ -153,14 +147,20 @@ const handleScriptSave = async (content: string) => {
 
   setIsLoading(true)
   try {
-    const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
-    const scriptId = editingScript?.id // Get the existing script ID if editing
-    
+    let scriptName = 'New Script'
+    if (selectedTemplate) {
+      scriptName = selectedTemplate.title
+    } else if (editingScript) {
+      scriptName = editingScript.name
+    } else if (uploadedContent) {
+      scriptName = editingScript?.name || 'Uploaded Script'
+    }
+
     let savedScript
-    if (scriptId) {
+    if (editingScript?.id) {
       // Update existing script
       savedScript = await scriptService.updateScript(
-        scriptId,
+        editingScript.id,
         teamId,
         {
           name: scriptName,
@@ -170,7 +170,7 @@ const handleScriptSave = async (content: string) => {
         }
       )
     } else {
-      // Create new script
+      // Create new script (either from template or upload)
       savedScript = await scriptService.createScript(
         teamId,
         memberId,
@@ -180,12 +180,13 @@ const handleScriptSave = async (content: string) => {
       )
     }
 
+    // Update the category data
     setCategoryData(prev => {
       const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
       if (categoryIndex !== -1) {
         const newData = [...prev]
-        if (editingScript) {
-          // Replace the existing script
+        if (editingScript?.id) {
+          // Replace existing script
           newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
             script.id === editingScript.id ? savedScript : script
           )
