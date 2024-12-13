@@ -23,6 +23,7 @@ export default function ScriptUploader() {
   const [categoryData, setCategoryData] = useState<CategoryData[]>([])
   const [history, setHistory] = useState<number[]>([1])
   const [editingScript, setEditingScript] = useState<SavedScript | null>(null)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
 
   // UI state
   const [isLoading, setIsLoading] = useState(true)
@@ -134,7 +135,8 @@ export default function ScriptUploader() {
 
   const handleUploadScript = async (content: string, fileName: string) => {
   setUploadedContent(content)
-  setEditingScript(null) // Clear any editing state
+  setUploadedFileName(fileName)
+  setEditingScript(null)
   setStep(3)
   setHistory([...history, 3])
 }
@@ -148,13 +150,15 @@ const handleScriptSave = async (content: string) => {
   setIsLoading(true)
   try {
     let scriptName: string
-    if (selectedTemplate) {
-      scriptName = selectedTemplate.title
-    } else if (editingScript) {
-      scriptName = editingScript.name
-    } else {
-      scriptName = 'Uploaded Script'
-    }
+if (selectedTemplate) {
+  scriptName = selectedTemplate.title
+} else if (editingScript) {
+  scriptName = editingScript.name
+} else if (uploadedFileName) {
+  scriptName = uploadedFileName
+} else {
+  scriptName = 'Uploaded Script'
+}
 
     let savedScript
     if (editingScript?.id) {
@@ -204,13 +208,14 @@ const handleScriptSave = async (content: string) => {
 
     setIsSaved(true)
     setTimeout(() => {
-      setStep(1)
-      setSelectedCategory(null)
-      setSelectedTemplate(null)
-      setUploadedContent(null)
-      setEditingScript(null)
-      setHistory([1])
-    }, 1500)
+  setStep(1)
+  setSelectedCategory(null)
+  setSelectedTemplate(null)
+  setUploadedContent(null)
+  setUploadedFileName(null)
+  setEditingScript(null)
+  setHistory([1])
+}, 1500)
   } catch (err) {
     setError('Error saving script. Please try again.')
     console.error('Script saving error:', err)
