@@ -218,21 +218,23 @@ export default function SetCallTargetsModal() {
                 {error}
               </div>
             )}
-            {saveSuccess && (
-              <div className="mb-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm">
-                Targets saved successfully!
-              </div>
-            )}
             {renderTargetInputs()}
           </div>
           <div className="p-8 border-t flex justify-center mt-auto">
             <Button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="bg-white text-black hover:bg-gray-50 px-6 h-[45px] rounded-[20px] text-lg font-semibold shadow-lg transition-all duration-200 hover:scale-[1.02] w-full max-w-xs border-2"
-            >
-              {isLoading ? 'Saving...' : 'Save Targets'}
-            </Button>
+  onClick={handleSubmit}
+  disabled={isLoading || saveSuccess}
+  className={`
+    bg-white text-black hover:bg-gray-50 
+    px-6 h-[45px] rounded-[20px] text-lg 
+    font-semibold shadow-lg transition-all 
+    duration-200 hover:scale-[1.02] 
+    w-full max-w-xs border-2
+    ${saveSuccess ? 'bg-green-50 text-green-600 border-green-200' : ''}
+  `}
+>
+  {isLoading ? 'Saving...' : saveSuccess ? 'Success!' : 'Save Targets'}
+</Button>
           </div>
         </div>
       </motion.div>
