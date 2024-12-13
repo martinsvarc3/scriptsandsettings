@@ -13,6 +13,7 @@ import { Category, Template, SavedScript, CategoryData } from '@/types'
 import { Check, AlertCircle } from 'lucide-react'
 import { scriptService } from '@/services/scriptService'
 import { getMemberData } from '@/utils/memberstack'
+import { categories } from '@/components/CategorySelector'
 
 export default function ScriptUploader() {
   // Core state
@@ -96,6 +97,35 @@ export default function ScriptUploader() {
 
     loadScripts()
   }, [selectedCategory, teamId, memberId])
+
+// Add this right after your other useEffects in ScriptUploader
+useEffect(() => {
+  const loadAllCategoryScripts = async () => {
+    if (!teamId || !memberId) return
+    
+    setIsLoading(true)
+    try {
+      // Load scripts for all categories
+      const scriptsPromises = categories.map(category => 
+        scriptService.getScripts(teamId, memberId, category)
+      )
+      
+      const results = await Promise.all(scriptsPromises)
+      
+      // Update categoryData with all results
+      setCategoryData(categories.map((category, index) => ({
+        category: category,
+        scripts: results[index]
+      })))
+    } catch (err) {
+      console.error('Error loading category scripts:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  loadAllCategoryScripts()
+}, [teamId, memberId]) // Dependencies
 
   const handleCategorySelect = async (category: Category) => {
   setSelectedCategory(category)
