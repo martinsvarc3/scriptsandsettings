@@ -15,8 +15,7 @@ import { scriptService } from '@/services/scriptService'
 import { getMemberData } from '@/utils/memberstack'
 import { categories } from '@/components/CategorySelector'
 
-export default function ScriptUploader() {
-  // Core state
+export default function ScriptUploader({ onReady }: { onReady: () => void }) {
   const [step, setStep] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
@@ -100,32 +99,33 @@ export default function ScriptUploader() {
 
 // Add this right after your other useEffects in ScriptUploader
 useEffect(() => {
-  const loadAllCategoryScripts = async () => {
-    if (!teamId || !memberId) return
-    
-    setIsLoading(true)
-    try {
-      // Load scripts for all categories
-      const scriptsPromises = categories.map(category => 
-        scriptService.getScripts(teamId, memberId, category)
-      )
+    const loadAllCategoryScripts = async () => {
+      if (!teamId || !memberId) return
       
-      const results = await Promise.all(scriptsPromises)
-      
-      // Update categoryData with all results
-      setCategoryData(categories.map((category, index) => ({
-        category: category,
-        scripts: results[index]
-      })))
-    } catch (err) {
-      console.error('Error loading category scripts:', err)
-    } finally {
-      setIsLoading(false)
+      setIsLoading(true)
+      try {
+        // Load scripts for all categories
+        const scriptsPromises = categories.map(category => 
+          scriptService.getScripts(teamId, memberId, category)
+        )
+        
+        const results = await Promise.all(scriptsPromises)
+        
+        // Update categoryData with all results
+        setCategoryData(categories.map((category, index) => ({
+          category: category,
+          scripts: results[index]
+        })))
+      } catch (err) {
+        console.error('Error loading category scripts:', err)
+      } finally {
+        setIsLoading(false)
+        onReady() // Add this line to signal component is ready
+      }
     }
-  }
 
-  loadAllCategoryScripts()
-}, [teamId, memberId]) // Dependencies
+    loadAllCategoryScripts()
+  }, [teamId, memberId, onReady]) // Add onReady to dependencies
 
   const handleCategorySelect = async (category: Category) => {
   setSelectedCategory(category)
