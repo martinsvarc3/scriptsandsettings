@@ -130,13 +130,13 @@ export default function SetCallTargetsModal() {
           <div className="flex items-center space-x-2">
             <Label
               htmlFor={`${activeCategory}-target-${index}`}
-              className="text-[#5b06be] text-xs sm:text-sm font-montserrat font-semibold"
+              className="text-[#000000] text-xs sm:text-sm font-montserrat font-semibold"
             >
               {target.name}
             </Label>
             <div className="relative">
               <Info
-                className="w-4 h-4 text-[#5b06be] cursor-pointer"
+                className="w-4 h-4 text-[#000000] cursor-pointer"
                 onClick={() => setShowInfo(index)}
               />
               {showInfo === index && (
@@ -230,7 +230,7 @@ export default function SetCallTargetsModal() {
     duration-200 hover:scale-[1.02] 
     w-full max-w-xs border-2
     ${saveSuccess 
-      ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' 
+      ? 'bg-[#5b06be] text-white border-[#5b06be] hover:bg-[#4a05a0]' 
       : 'bg-white text-black hover:bg-gray-50'
     }
   `}
