@@ -196,7 +196,7 @@ export default function SetCallTargetsModal() {
             />
           </div>
           <div className="flex-1">
-            <h2 className="text-[18px] md:text-[16px] sm:text-[14px] font-extrabold font-montserrat leading-tight text-[#000000] mb-1">
+            <h2 className="text-[18px] md:text-[16px] sm:text-[14px] font-extrabold font-montserrat leading-tight text-[#5b06be] mb-1">
               Set the challenge your team must overcome to unlock a new avatar. 
             </h2>
             <p className="text-[11px] md:text-[10px] sm:text-[9px] font-bold font-montserrat text-gray-600 leading-snug">
