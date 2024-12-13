@@ -9,7 +9,7 @@ interface CategorySelectorProps {
 }
 
 // Could be moved to a constants file
-const categories: Category[] = [
+export const categories: Category[] = [
   'Wholesaling',
   'Creative Finance', 
   'Agent Outreach',
