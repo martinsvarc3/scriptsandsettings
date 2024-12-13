@@ -1,7 +1,6 @@
 'use client'
 
 import { Category, CategoryData } from '@/types'
-import { Check, Folder } from 'lucide-react'
 
 interface CategorySelectorProps {
   onSelect: (category: Category) => void
@@ -32,9 +31,6 @@ export default function CategorySelector({ onSelect, categoryData }: CategorySel
             type="button"
           >
             <span className="truncate">{category}</span>
-            {hasScripts && (
-              <Folder className="ml-2 w-4 h-4 flex-shrink-0 text-[#5b06be]" />
-            )}
           </button>
         )
       })}
