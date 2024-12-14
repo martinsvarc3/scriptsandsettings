@@ -45,15 +45,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 justify-center items-stretch px-3">
-        <div className="w-full lg:w-1/2 flex justify-center">
-          <ScriptUploader />
-        </div>
-        <div className="w-full lg:w-1/2 flex justify-center">
-          <SetCallTargetsModal />
-        </div>
-      </div>
-    </main>
-  )
-}
+<main className="flex">
+  <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6">
+    <div className="w-full lg:w-1/2 flex">
+      <ScriptUploader />
+    </div>
+    <div className="w-full lg:w-1/2 flex">
+      <SetCallTargetsModal />
+    </div>
+  </div>
+</main>
