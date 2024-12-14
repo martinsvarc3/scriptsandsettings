@@ -7,7 +7,6 @@ const getDbClient = async () => {
   return client;
 };
 
-// Existing GET endpoint remains the same
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const teamId = searchParams.get('teamId');
@@ -30,7 +29,6 @@ export async function GET(request: Request) {
   }
 }
 
-// Modified POST endpoint to include new fields
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -72,43 +70,5 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('Database error:', err);
     return NextResponse.json({ error: 'Failed to save performance goals' }, { status: 500 });
-  }
-}
-
-// New endpoint for N8N to fetch call duration
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { teamId, memberId } = body;
-    
-    if (!teamId && !memberId) {
-      return NextResponse.json({ call_length: 10 });
-    }
-
-    const client = await getDbClient();
-    let query = '';
-    let params = [];
-
-    // First try with teamId if provided
-    if (teamId) {
-      query = 'SELECT call_length FROM performance_goals WHERE team_id = $1 LIMIT 1';
-      params = [teamId];
-    } else {
-      // If no teamId or no results found with teamId, try memberId
-      query = 'SELECT call_length FROM performance_goals WHERE member_id = $1 LIMIT 1';
-      params = [memberId];
-    }
-
-    const { rows } = await client.query(query, params);
-    await client.end();
-
-    // Return 10 if no results found
-    return NextResponse.json({ 
-      call_length: rows.length > 0 ? rows[0].call_length : 10 
-    });
-
-  } catch (err) {
-    console.error('Database error:', err);
-    return NextResponse.json({ call_length: 10 });
   }
 }
