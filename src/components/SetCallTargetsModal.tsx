@@ -8,15 +8,15 @@ import Image from 'next/image'
 import { Info } from 'lucide-react'
 import { getMemberData } from "@/utils/memberstack"
 
-type TargetType = {
-  name: string;
-  min: number;
-  max: number;
-  unit?: string;
-  infoText: string; 
+interface TargetConfig {
+  name: string
+  min: number
+  max: number
+  unit?: string
+  infoText: string
 }
 
-const targetTypes: TargetType[] = [
+const INITIAL_TARGET_TYPES: TargetConfig[] = [
   { 
     name: "Overall Performance", 
     min: 0, 
@@ -39,15 +39,9 @@ const targetTypes: TargetType[] = [
   }
 ]
 
-const targetTypes: TargetType[] = [
-  { name: "Overall Performance", min: 0, max: 100, unit: "%" },
-  { name: "Number of calls", min: 0, max: 50 },
-  { name: "Call length", min: 5, max: 30, unit: "minutes" }
-]
-
 export default function SetCallTargetsModal() {
   const [activeCategory] = useState<'intermediate' | 'expert'>('intermediate')
-  const [targets, setTargets] = useState(targetTypes.map(() => ""))
+  const [targets, setTargets] = useState<string[]>(INITIAL_TARGET_TYPES.map(() => ""))
   const [showInfo, setShowInfo] = useState<number | null>(null)
   const [teamId, setTeamId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -55,14 +49,12 @@ export default function SetCallTargetsModal() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const popupRef = useRef<HTMLDivElement>(null)
 
-  // Initialize team data
   useEffect(() => {
     const initializeMemberData = async () => {
       try {
         const { teamId } = await getMemberData()
         setTeamId(teamId)
         
-        // Fetch existing goals if any
         if (teamId) {
           const response = await fetch(`/api/performance-goals?teamId=${teamId}`)
           if (response.ok) {
@@ -71,7 +63,7 @@ export default function SetCallTargetsModal() {
               setTargets([
                 data.overall_performance_goal.toString(),
                 data.number_of_calls_average.toString(),
-                targets[2] // Preserve call length value
+                data.call_length?.toString() || ""
               ])
             }
           }
@@ -86,16 +78,14 @@ export default function SetCallTargetsModal() {
   }, [])
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
         setShowInfo(null)
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,7 +108,7 @@ export default function SetCallTargetsModal() {
           teamId,
           overall_performance_goal: Number(targets[0]),
           number_of_calls_average: Number(targets[1]),
-          call_length: Number(targets[2])  // Added this line
+          call_length: Number(targets[2])
         })
       })
 
@@ -136,7 +126,7 @@ export default function SetCallTargetsModal() {
     }
   }
 
-  const getGradientColor = (value: number) => {
+  const getGradientColor = (value: number): string => {
     if (value < 50) return 'from-[#50c2aa] to-[#50c2aa]'
     if (value < 80) return 'from-[#f8b923] to-[#f8b923]'
     return 'from-[#ff0000] to-[#ff0000]'
@@ -148,8 +138,17 @@ export default function SetCallTargetsModal() {
     setTargets(newTargets)
   }
 
+  const InfoPopup: React.FC<{ text: string }> = ({ text }) => (
+    <div 
+      ref={popupRef} 
+      className="absolute left-0 mt-2 p-3 bg-white border border-gray-200 rounded-md shadow-lg z-10 w-64"
+    >
+      <p className="text-xs text-gray-600 leading-relaxed">{text}</p>
+    </div>
+  )
+
   const renderTargetInputs = () => {
-    return targetTypes.map((target, index) => (
+    return INITIAL_TARGET_TYPES.map((target, index) => (
       <div key={`${activeCategory}-${index}`} className="mb-8">
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
@@ -161,14 +160,10 @@ export default function SetCallTargetsModal() {
             </Label>
             <div className="relative">
               <Info
-                className="w-4 h-4 text-[#5b06be] cursor-pointer"
-                onClick={() => setShowInfo(index)}
+                className="w-4 h-4 text-[#5b06be] cursor-pointer hover:text-[#4a05a0] transition-colors"
+                onClick={() => setShowInfo(showInfo === index ? null : index)}
               />
-              {showInfo === index && (
-  <div ref={popupRef} className="absolute left-0 mt-2 p-2 bg-white border border-gray-200 rounded-md shadow-md z-10 w-64">
-    <p className="text-xs text-gray-600">{target.infoText}</p>
-  </div>
-)}
+              {showInfo === index && <InfoPopup text={target.infoText} />}
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -188,9 +183,7 @@ export default function SetCallTargetsModal() {
                 min={target.min}
                 max={target.max}
                 value={targets[index] || target.min}
-                onChange={(e) => {
-                  updateTargets(index, e.target.value)
-                }}
+                onChange={(e) => updateTargets(index, e.target.value)}
                 className="absolute inset-0 w-full h-full appearance-none bg-transparent focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb]:ease-in-out [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-300 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:ease-in-out [&::-moz-range-thumb]:hover:scale-110"
               />
             </div>
@@ -247,21 +240,21 @@ export default function SetCallTargetsModal() {
           </div>
           <div className="p-8 border-t flex justify-center mt-auto">
             <Button
-  onClick={handleSubmit}
-  disabled={isLoading || saveSuccess}
-  className={`
-    px-6 h-[45px] rounded-[20px] text-lg 
-    font-semibold shadow-lg transition-all 
-    duration-200 hover:scale-[1.02] 
-    w-full max-w-xs border-2
-    ${saveSuccess 
-      ? 'bg-[#5b06be] text-white border-[#5b06be] hover:bg-[#4a05a0]' 
-      : 'bg-white text-black hover:bg-gray-50'
-    }
-  `}
->
-  {isLoading ? 'Saving...' : saveSuccess ? 'Success!' : 'Save Targets'}
-</Button>
+              onClick={handleSubmit}
+              disabled={isLoading || saveSuccess}
+              className={`
+                px-6 h-[45px] rounded-[20px] text-lg 
+                font-semibold shadow-lg transition-all 
+                duration-200 hover:scale-[1.02] 
+                w-full max-w-xs border-2
+                ${saveSuccess 
+                  ? 'bg-[#5b06be] text-white border-[#5b06be] hover:bg-[#4a05a0]' 
+                  : 'bg-white text-black hover:bg-gray-50'
+                }
+              `}
+            >
+              {isLoading ? 'Saving...' : saveSuccess ? 'Success!' : 'Save Targets'}
+            </Button>
           </div>
         </div>
       </motion.div>
