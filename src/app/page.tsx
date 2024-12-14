@@ -16,19 +16,15 @@ export default function Home() {
       try {
         // Get member data
         const { teamId, memberstackId } = await getMemberData()
-
         // Preload scripts
         const scriptsPromises = categories.map(category => 
           scriptService.getScripts(teamId, memberstackId, category)
         )
         await Promise.all(scriptsPromises)
-
         // Preload performance goals
         await fetch(`/api/performance-goals?teamId=${teamId}`)
-
         // Wait additional 1 second to ensure smooth transition
         await new Promise(resolve => setTimeout(resolve, 1000))
-
         setIsLoading(false)
       } catch (err) {
         console.error('Error preloading:', err)
@@ -36,7 +32,6 @@ export default function Home() {
         setTimeout(() => setIsLoading(false), 2000)
       }
     }
-
     preloadData()
   }, [])
 
@@ -45,13 +40,15 @@ export default function Home() {
   }
 
   return (
-<main className="flex">
-  <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6">
-    <div className="w-full lg:w-1/2 flex">
-      <ScriptUploader />
-    </div>
-    <div className="w-full lg:w-1/2 flex">
-      <SetCallTargetsModal />
-    </div>
-  </div>
-</main>
+    <main className="flex">
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6">
+        <div className="w-full lg:w-1/2 flex">
+          <ScriptUploader />
+        </div>
+        <div className="w-full lg:w-1/2 flex">
+          <SetCallTargetsModal />
+        </div>
+      </div>
+    </main>
+  )
+} // <-- This closing bracket was likely missing
