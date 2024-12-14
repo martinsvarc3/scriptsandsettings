@@ -3,35 +3,54 @@ import { Category, Template } from '@/types'
 const templates: Record<Category, Template[]> = {
   'Wholesaling': [
     {
-      title: "Basic Wholesaling Script",
-      preview: "A straightforward script for initial contact with potential sellers.",
-      fullScript: "Hello, I'm calling about your property at [ADDRESS]..."
+      title: "Tallbridge Acquisition Script",
+      preview: "Professional acquisition script for wholesale deals with complete process from contact to close.",
+      fullScript: "INTRO (Be Excited, Confident, and Assumptive)\n\nOUTBOUND - Hi [FIRST NAME] this is [YOUR NAME] calling from Tallbridge Investments. I am one of the Sr. buying specialist here. Your file came across my desk from our junior associate regarding the property at [ADDRESS].\n\nINBOUND - This is [YOUR NAME] How can I help you (Make it personal. Do you not use company name?)\n\nJust want to confirm some of the property details, I apologize in advance if some what we discuss is redundant but want to make sure I have all the correct facts so we can give you our best offer.\n\nSETTING THE STAGE\n• Great...Typically, people who call us want to know what we do, how we do it, & how much we can offer for their property... those kinds of things. Do you have those same types of questions?\n\n• Firstly, we are Real Estate Investment Company. We work with a group of investors and we buy in AS IS condition, all cash and can close in your timeframe. Sometimes in as little as a few days. There are no hidden fees, real-estate commission and we pay all closing costs! Make sense?\n\n• This process takes about 7 minutes. Sound good?\n\nCONTACT INFORMATION\n• Is it ok if I start by confirming your full name and the address of the property please?\n• Is this the best phone number for you?\n• Where would you like us to email our offer and contact information to?\n\nPROPERTY CONDITION\nNow I'm going to run through some quick questions about the property, ok?\n1. How long have you owned the property?\n2. Is it occupied?\n3. Obviously, we are not together in your property but let's imagine for moment we are. What's the general condition of the house?\n4. How many bedrooms and bathrooms?\n5. Are there any major repairs that need to be done?\n6. Does the house have any special features?\n7. Have the roof or windows ever been replaced?\n8. Have the kitchens and bathrooms been fully updated recently?\n9. Is there anything else you would like to tell me about the property?\n\nMOTIVATION (MIRROR AND LABEL)\nThis sounds like a property we might be interested in ...\n• Why are you thinking about selling it?\n\nMOTIVATION (Diving Deeper)\n• Really?\n• How long have you been thinking about selling?\n\nTIMELINE\n• If you did decide to sell to us or anyone else, would you like to do so within 30 days, 90 days, or further out?\n\nAMOUNT OWED\n• If we buy the property, will we need to pay off any taxes, liens, or a mortgage?\n• (If So) Do you have a rough idea of how much?\n\nHOME VALUE\n• I haven't done my research yet...BUT Considering Condition, (repeat the repairs needed) did you have any idea as to what you think it might be worth or WHAT you need to at least sell it for? Is that your asking price?\n\nNEGOTIATE\n• If we can cover all the closing costs, fees and commissions for you, and close on a timeframe that works best for you, what is the best price you can do?\n• Good Price: (If yes, move to close!)\n• Bad price: Go over what they said needs be done to the property give approximate prices of similar properties, touch on pain points and time\n• We are close, I think we can get a deal done\n\nCLOSE\n• Okay, let me do this. I'm going to speak with my partner quick to see if we can do that price. I'm not sure if it is, but if it is a price, we can do what would be THE deciding factor on signing a contract today?\n• Perfect. Is it okay if I put on hold? Super important.\n• Okay, well I've got great news! It looks like we can do that price. So, the next step is I'm going to send you over an email so we can review the agreement together. What is the best email for you?\n• Alright great. When would you be able to get in front of a computer or have access to your email?"
     },
-    // Add more wholesaling templates
+    {
+      title: "Cold Calling Machines Vacant Property Script",
+      preview: "Direct approach script for vacant property owners",
+      fullScript: "Hi, can I speak to [OWNER FIRST NAME or Mr./Mrs. LAST NAME] please?\n\nHey [OWNER FIRST NAME], My name is [YOUR FIRST NAME] and I was calling to see if you are still the owner of [PROPERTY ADDRESS]?\n\nAwesome! I know this may be random, but I wanted to reach out to you because the other day I was driving around the area, and I saw your property and wanted to see if you would have any interest in selling it to me?"
+    },
+    {
+      title: "Family Members/Relatives Contact Script",
+      preview: "Script for reaching out to owner's family members or acquaintances",
+      fullScript: "Hi can I speak to [OWNER FIRST NAME or Mr./Mrs. LAST NAME] please?\n\nI am trying to get a hold of [OWNER NAME] in regards to a property I believe he/she owns on [STREET NAME].\n\nDo you know [OWNER NAME] or do you know how I can get a hold of him/her?"
+    },
+    {
+      title: "Professional Voicemail Script",
+      preview: "Non-threatening voicemail script for property owners",
+      fullScript: "Hi, I'm calling to speak to [OWNER'S FIRST NAME]. I know you're very busy so I was just trying to catch you at a good time to ask a few questions about a property I believe you own on [STREET NAME]. This is [YOUR NAME] if you could give me a call or text my cell is [YOUR NUMBER]. Talk to you soon! Have a nice night!"
+    },
+    {
+      title: "Midwest Revenue Cold Calling Script",
+      preview: "Comprehensive outbound calling script with objection handling",
+      fullScript: "Hi, this is [NAME] with [COMPANY]. I'm a local investor and I'm looking to buy a property in the area. I know this is a shot in the dark... I'm not sure if I even have the right number, but do you happen to have a property to sell?\n\nIf 'yes': Move right into collecting info and going into your normal scripting.\n\nIf 'no': Are you sure... it'll just take a few minutes and then if you're ever ready to sell you would know exactly what we would pay.\n\nSounds good - Do you have about 5 minutes so I can ask you some questions about your property?\n\nOk, great…after that I'll let you know what your options are and you can just let me know what you'd like to do.\n\nCONTACT INFORMATION\nMay I have your full name, and the address of the property please?\nWhat's the best phone number for you?\nWhere would you like us to email our contact information to?\n\nPROPERTY CONDITION\nNow I'm going to run through some quick questions about the property.\n• What's the general condition of the house?\n• Are there any major or minor repairs you haven't mentioned that need to be done?\n• How long have you owned the property?\n• Is anyone living in the property right now?\n• ***If it's a rental property, ask 'how much does it typically rent for?'\n• How many bedrooms and bathrooms?\n• What's the condition of the roof and windows?\n• Have the kitchens or bathrooms been updated within the last 3 years?\n• Does the property have any special features?\n• Is the property currently listed with a realtor? ***If yes, 'can I get the contact information for your realtor?'\n• Is there anything else you think I should know about the property?\n\nOBJECTION HANDLING\n'Why did you call me?': We are looking to buy a house in that area.\n\n'Why did you think I'm selling?': We really didn't know if you had any interest in selling, but we are looking for homes in your area, so we contacted you.\n\n'What is your offer?': I'm not sure yet. I'll need to ask some questions about the condition of the property to figure that out.\n\n'Have you seen my house?': No. I haven't personally seen your home, but we are looking to buy a house in that area.\n\n'I'm not sure I'll sell': I completely understand. By receiving an offer, you're under no obligation to do anything.\n\n'You can't have my email address': That's no problem.\n\n'How'd you get my information?': Good question... our marketing department gets the information through public records."
+    }
   ],
+
   'Creative Finance': [
     {
-      title: "Owner Financing Script",
-      preview: "Script for discussing owner financing options with sellers.",
-      fullScript: "Hi, I'm reaching out regarding your property..."
-    },
-    // Add more creative finance templates
+      title: "Subject-To Negotiation Script",
+      preview: "Script for negotiating subject-to deals with motivated sellers",
+      fullScript: "Hi [OWNER NAME], this is [YOUR NAME] with [COMPANY NAME].\n\nI understand you might be looking to sell your property at [ADDRESS]. I wanted to discuss a unique solution that could help you sell quickly while potentially saving your credit and avoiding foreclosure.\n\nWe have a program where we can take over your existing mortgage payments while giving you some cash now. Would you like to hear more about how this works?\n\nBENEFITS EXPLANATION:\n• You can sell quickly without having to come out of pocket\n• You won't have any more mortgage payments to worry about\n• We'll maintain the property and keep up the payments\n• You can avoid potential credit issues\n• You can get some cash now to help with your situation\n\nWhat amount do you currently owe on the mortgage?\nWhat's your current monthly payment?\nAre you current on the payments?\nWould you be interested in exploring this option further?"
+    }
   ],
+
   'Agent Outreach': [
     {
-      title: "Agent Partnership Script",
-      preview: "Build relationships with real estate agents.",
-      fullScript: "Hello [AGENT NAME], I'm calling to discuss potential partnerships..."
-    },
-    // Add more agent outreach templates
+      title: "Listing Agent Partnership Script",
+      preview: "Build relationships with real estate agents for wholesale deals",
+      fullScript: "Hi [AGENT NAME], this is [YOUR NAME] with [COMPANY NAME].\n\nI work with a network of investors who buy multiple properties each month in [AREA], and I'm looking to build relationships with successful agents like yourself.\n\nWe can be a great resource for your:\n• Expired listings\n• Properties that need significant work\n• Sellers who need to close quickly\n• Situations where traditional financing won't work\n\nWhat we offer:\n• Quick closings (as fast as 7-14 days)\n• Cash purchases\n• As-is condition (no repairs needed)\n• Full commission to agents\n• No showings or open houses required\n\nWould you be open to grabbing coffee this week to discuss how we might be able to help each other?\n\nI'd love to learn more about your business and share how we might be able to provide value as another tool in your toolbox for helping sellers."
+    }
   ],
+
   'Foreclosure': [
     {
-      title: "Foreclosure Assistance Script",
-      preview: "Help homeowners facing foreclosure.",
-      fullScript: "Hi, I understand you might be in a difficult situation..."
-    },
-    // Add more foreclosure templates
+      title: "Pre-Foreclosure Assistance Script",
+      preview: "Compassionate script for helping homeowners facing foreclosure",
+      fullScript: "Hello [OWNER NAME], my name is [YOUR NAME] with [COMPANY NAME].\n\nI understand this may be a difficult time, and I want you to know that I might be able to help with your situation at [ADDRESS]. We specialize in working with homeowners facing foreclosure and can often help preserve credit while avoiding foreclosure completely.\n\nThere are several options that might be available to you, including:\n• Selling quickly for cash before the foreclosure\n• Potentially staying in the home as a renter\n• Working with your lender on your behalf\n• Discussing possible short sale options\n\nThe most important thing is to know your options before it's too late. Would you be open to having a confidential conversation about your situation?\n\nKey Questions:\n• Where are you in the foreclosure process?\n• Have you been working with your lender?\n• What's your ideal outcome in this situation?\n• How much do you think you owe on the property?\n• Would you like to stay in the area?\n\nI'm here to help and everything we discuss will be kept completely confidential. Would you like to meet in person to discuss your options in more detail?"
+    }
   ]
 }
 
