@@ -39,7 +39,7 @@ export default function ScriptFolder({
         </button>
         <h2 className="text-base font-semibold font-montserrat">{category} Scripts</h2>
       </div>
-      <div className="scrollable-content space-y-3 max-h-[400px] overflow-y-auto">
+      <div className="scrollable-content space-y-3 max-h-[400px] overflow-y-auto overflow-x-hidden w-full">
         {scripts.map((script) => (
           <div key={script.id} className="bg-[#f2f3f8] p-4 rounded-[20px] border border-[#d1d1d1]">
             <div className="flex flex-col space-y-2">
