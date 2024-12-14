@@ -93,7 +93,8 @@ export default function SetCallTargetsModal() {
         body: JSON.stringify({
           teamId,
           overall_performance_goal: Number(targets[0]),
-          number_of_calls_average: Number(targets[1])
+          number_of_calls_average: Number(targets[1]),
+          call_length: Number(targets[2])  // Added this line
         })
       })
 
