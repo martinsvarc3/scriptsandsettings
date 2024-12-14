@@ -13,7 +13,31 @@ type TargetType = {
   min: number;
   max: number;
   unit?: string;
+  infoText: string; 
 }
+
+const targetTypes: TargetType[] = [
+  { 
+    name: "Overall Performance", 
+    min: 0, 
+    max: 100, 
+    unit: "%",
+    infoText: "The minimum average score (%) your team members must achieve across their required number of role-play calls to unlock the next avatar. For example, if set to 70%, they must maintain at least a 70% average score."
+  },
+  { 
+    name: "Number of calls", 
+    min: 0, 
+    max: 50,
+    infoText: "The minimum number of role-play calls your team members must complete while maintaining the target performance score. These calls must be completed to qualify for avatar progression."
+  },
+  { 
+    name: "Call length", 
+    min: 5, 
+    max: 30, 
+    unit: "minutes",
+    infoText: "Set the length of each role-play session in minutes. This determines how long team members have to demonstrate their skills in each practice call."
+  }
+]
 
 const targetTypes: TargetType[] = [
   { name: "Overall Performance", min: 0, max: 100, unit: "%" },
@@ -141,10 +165,10 @@ export default function SetCallTargetsModal() {
                 onClick={() => setShowInfo(index)}
               />
               {showInfo === index && (
-                <div ref={popupRef} className="absolute left-0 mt-2 p-2 bg-white border border-gray-200 rounded-md shadow-md z-10 w-48">
-                  <p className="text-xs text-gray-600">This is some information about {target.name}.</p>
-                </div>
-              )}
+  <div ref={popupRef} className="absolute left-0 mt-2 p-2 bg-white border border-gray-200 rounded-md shadow-md z-10 w-64">
+    <p className="text-xs text-gray-600">{target.infoText}</p>
+  </div>
+)}
             </div>
           </div>
           <div className="flex items-center gap-4">
