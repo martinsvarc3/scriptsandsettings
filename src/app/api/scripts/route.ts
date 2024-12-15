@@ -61,8 +61,8 @@ export async function POST(request: Request) {
     const client = await getDbClient();
     const { rows } = await client.query(
       `INSERT INTO scripts 
-       (team_id, memberstack_id, name, content, category)
-       VALUES ($1, $2, $3, $4, $5)
+       (team_id, memberstack_id, name, content, category, last_edited)
+       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
        RETURNING *`,
       [teamId, memberstackId, name || 'Untitled Script', content, category]
     );
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, teamId, memberstackId, name, content, isSelected } = body;
+    const { id, teamId, memberstackId, name, content, isSelected, category } = body;
 
     if (!id || !teamId) {
       return NextResponse.json({ error: 'ID and Team ID required' }, { status: 400 });
@@ -100,6 +100,7 @@ export async function PUT(request: Request) {
     if (content !== undefined) fieldsToUpdate.content = content;
     if (isSelected !== undefined) fieldsToUpdate.is_selected = isSelected;
     if (memberstackId !== undefined) fieldsToUpdate.memberstack_id = memberstackId;
+    if (category !== undefined) fieldsToUpdate.category = category;
 
     for (const [key, value] of Object.entries(fieldsToUpdate)) {
       updateFields.push(`${key} = $${paramCount}`);
