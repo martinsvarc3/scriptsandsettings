@@ -23,20 +23,20 @@ const INITIAL_TARGET_TYPES: TargetConfig[] = [
     min: 0, 
     max: 100, 
     unit: "%",
-    infoText: "The minimum average score (%) your team members must achieve across their required number of role-play calls to unlock the next avatar. For example, if set to 70%, they must maintain at least a 70% average score."
+    infoText: "The minimum average score (%) your team members must achieve across their required number of training calls to unlock the next avatar. For example, if set to 70%, they must maintain at least a 70% average score."
   },
   { 
     name: "Number of calls", 
     min: 0, 
     max: 50,
-    infoText: "The minimum number of role-play calls your team members must complete while maintaining the target performance score. These calls must be completed to qualify for avatar progression."
+    infoText: "The minimum number of training calls your team members must complete while maintaining the target performance score. These calls must be completed to qualify for avatar progression."
   },
   { 
     name: "Call length", 
     min: 5, 
     max: 30, 
     unit: "minutes",
-    infoText: "Set the length of each role-play session in minutes. This determines how long team members have to demonstrate their skills in each practice call."
+    infoText: "Set the length of each training session in minutes. This determines how long team members have to demonstrate their skills in each practice call."
   }
 ]
 
@@ -224,7 +224,7 @@ export default function SetCallTargetsModal() {
                   />
                   {showInfo === 3 && (
                     <InfoPopup 
-                      text="When enabled, users can request additional time during their role-play calls if needed." 
+                      text="When enabled, users can request additional time during their training calls if needed." 
                     />
                   )}
                 </div>
