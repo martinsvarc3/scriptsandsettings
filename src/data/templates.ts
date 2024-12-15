@@ -2,10 +2,10 @@ import { Category, Template } from '@/types'
 
 const templates: Record<Category, Template[]> = {
   'Wholesaling': [
-   {
-     title: "High-Converting Wholesaling Property Acquisition Script",
-     preview: "To identify motivated sellers and secure wholesale real estate deals through cold calling. Duration: 8-12 minutes",
-     fullScript: "OPENING (0-60 seconds)
+  {
+    title: "High-Converting Wholesaling Property Acquisition Script",
+    preview: "To identify motivated sellers and secure wholesale real estate deals through cold calling. Duration: 8-12 minutes",
+    fullScript: `OPENING (0-60 seconds)
 "Hi, this is [YOUR NAME] with [COMPANY NAME]. I'm a local real estate investor actively looking to buy properties in [AREA/NEIGHBORHOOD]. I noticed your property at [ADDRESS] and wanted to reach out directly to see if you might consider selling for the right offer?"
 
 [If they seem hesitant]
@@ -75,8 +75,8 @@ When would be the best time for me to come take a look at the property?"
 "I understand you need time to think about it. Would it be okay if I:
 1. Send you some information about our company by email?
 2. Follow up with you next week to answer any questions?
-3. Add you to our priority buyer list in case our offer increases?",
-   }
+3. Add you to our priority buyer list in case our offer increases?"`
+  }
 ],
   'Creative Finance': [
     {
