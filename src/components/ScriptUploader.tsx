@@ -189,19 +189,28 @@ export default function ScriptUploader() {
     }
   }
 
-  const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
-    setUploadedContent(content)
-    setUploadedFileName(fileName)
+ const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
+  setUploadedContent(content)
+  setUploadedFileName(fileName)
+  setEditingScript({
+    id: Date.now().toString(),
+    name: customName || fileName,
+    content: content,
+    lastEdited: new Date().toISOString(),
+    isSelected: false
+  })
+  setStep(3)
+  setHistory([...history, 3])
+}
+
+const handleNameUpdate = (newName: string) => {
+  if (editingScript) {
     setEditingScript({
-      id: Date.now().toString(),
-      name: customName || fileName,
-      content: content,
-      lastEdited: new Date().toISOString(),
-      isSelected: false
+      ...editingScript,
+      name: newName
     })
-    setStep(3)
-    setHistory([...history, 3])
   }
+}
 
   const handleNameUpdate = (newName: string) => {
     if (editingScript) {
@@ -213,15 +222,15 @@ export default function ScriptUploader() {
   }
 
   const handleScriptSave = async (content: string, scriptName?: string) => {
-    if (!teamId || !memberId || !selectedCategory) {
-      setError('Unable to save script. Please try again.')
-      return
-    }
+  if (!teamId || !memberId || !selectedCategory) {
+    setError('Unable to save script. Please try again.')
+    return
+  }
 
-    setIsLoading(true)
-    try {
-      const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
-      let savedScript
+  setIsLoading(true)
+  try {
+    const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
+    let savedScript
 
       if (editingScript?.id && editingScript.id.length > 13) {
         savedScript = await scriptService.updateScript(
@@ -445,16 +454,16 @@ export default function ScriptUploader() {
           )}
           
           {step === 3 && (selectedTemplate || uploadedContent || editingScript) && (
-            <ScriptEditor
-              template={selectedTemplate}
-              uploadedContent={uploadedContent || undefined}
-              editingScript={editingScript}
-              onSave={handleScriptSave}
-              handleGoBack={handleGoBack}
-              onRename={handleRenameScript}
-              onNameUpdate={handleNameUpdate}
-            />
-          )}
+  <ScriptEditor
+    template={selectedTemplate}
+    uploadedContent={uploadedContent || undefined}
+    editingScript={editingScript}
+    onSave={handleScriptSave}
+    handleGoBack={handleGoBack}
+    onRename={handleRenameScript}
+    onNameUpdate={handleNameUpdate}
+  />
+)}
           
           {step === 5 && selectedCategory && (
             <ScriptFolder
