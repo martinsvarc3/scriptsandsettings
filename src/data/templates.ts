@@ -2,12 +2,82 @@ import { Category, Template } from '@/types'
 
 const templates: Record<Category, Template[]> = {
   'Wholesaling': [
-    {
-      title: "Professional Acquisition Script",
-      preview: "Professional acquisition script for wholesale deals with complete process from contact to close.",
-      fullScript: "Hi [OWNER_NAME], this is [YOUR_NAME] calling from [COMPANY_NAME]. I am one of the senior buying specialists here. Your file came across my desk from our acquisitions team regarding the property at [ADDRESS].\n\nJust want to confirm some of the property details, I apologize in advance if some of what we discuss is redundant but want to make sure I have all the correct facts so we can give you our best offer.\n\nSETTING THE STAGE\n• [OWNER_NAME], typically people who call us want to know what we do, how we do it, & how much we can offer for their property... those kinds of things. Do you have those same types of questions?\n\n• We are a Real Estate Investment Company. We work with a group of investors and we buy in AS IS condition, all cash and can close in your timeframe. Sometimes in as little as a few days. There are no hidden fees, real-estate commission and we pay all closing costs! Make sense?\n\n[REST OF ACQUISITION SCRIPT CONTINUES...]"
-    }
-  ],
+   {
+     title: "High-Converting Wholesaling Property Acquisition Script",
+     preview: "To identify motivated sellers and secure wholesale real estate deals through cold calling. Duration: 8-12 minutes",
+     fullScript: "OPENING (0-60 seconds)
+"Hi, this is [YOUR NAME] with [COMPANY NAME]. I'm a local real estate investor actively looking to buy properties in [AREA/NEIGHBORHOOD]. I noticed your property at [ADDRESS] and wanted to reach out directly to see if you might consider selling for the right offer?"
+
+[If they seem hesitant]
+"I understand this call is unexpected. We're local investors who buy properties as-is for cash, and I'd love to learn more about your property if you have just a few minutes."
+
+INITIAL QUALIFICATION (1-2 minutes)
+"Would you have about 5-7 minutes to answer a few questions about the property? This will help me understand if it might be a good fit for our investment portfolio."
+
+[If YES]
+"Excellent! Let me get some basic information first."
+
+[If NO]
+"I completely understand. When would be a better time to have this conversation?"
+
+CONTACT INFORMATION (2-3 minutes)
+"Before we discuss the property, let me verify a few details:
+- Could you confirm your full name?
+- And I have your property address as [ADDRESS] - is that correct?
+- What's the best phone number to reach you?
+- Where would you like me to send additional information by email?"
+
+PROPERTY CONDITION (3-5 minutes)
+"Now, I'd like to learn more about your property:
+- How long have you owned the house?
+- Is anyone currently living in the property?
+- What's the general condition of the house?
+- Are there any repairs or updates needed?
+- How many bedrooms and bathrooms does it have?
+- What's the approximate square footage?
+- Have you done any major renovations recently?
+- How would you describe the condition of the roof and foundation?
+- Are there any special features I should know about?"
+
+MOTIVATION DISCOVERY (5-7 minutes)
+"Thank you for sharing those details. May I ask what's making you consider selling at this time?"
+
+[Listen carefully and show empathy]
+
+"How long have you been thinking about selling?"
+
+[If they mention any challenges or problems]
+"That sounds challenging. How has that been affecting you?"
+
+TIMELINE AND FINANCIAL POSITION (7-8 minutes)
+"If you decided to move forward with selling:
+- What kind of timeline are you looking at - 30 days, 90 days, or longer?
+- Are there any mortgages or liens on the property?
+- Do you have a rough idea of the payoff amount?"
+
+PRICE DISCUSSION (8-9 minutes)
+"Regarding property value:
+- Have you had any other offers on the property?
+- Do you have a specific price in mind?
+- Would you be flexible on price for a quick, as-is cash sale with no realtor fees?"
+
+CLOSING & NEXT STEPS (9-10 minutes)
+[If Showing Strong Interest]
+"This sounds like it could be a great fit for our buying criteria. Here's what happens next:
+1. I'd like to schedule a quick 15-minute walkthrough of the property
+2. My team will analyze the information and prepare a cash offer
+3. We can present you with a no-obligation offer within 24 hours after viewing
+4. If you accept, we can close in as little as 7-14 days
+
+When would be the best time for me to come take a look at the property?"
+
+[If Needs Time]
+"I understand you need time to think about it. Would it be okay if I:
+1. Send you some information about our company by email?
+2. Follow up with you next week to answer any questions?
+3. Add you to our priority buyer list in case our offer increases?",
+   }
+],
   'Creative Finance': [
     {
       title: "Owner Financing Script",
