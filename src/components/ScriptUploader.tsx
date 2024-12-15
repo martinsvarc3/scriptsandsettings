@@ -98,76 +98,71 @@ export default function ScriptUploader() {
     loadScripts()
   }, [selectedCategory, teamId, memberId])
 
-// Add this right after your other useEffects in ScriptUploader
-useEffect(() => {
-  const loadAllCategoryScripts = async () => {
-    if (!teamId || !memberId) return
-    
+  // Load all category scripts
+  useEffect(() => {
+    const loadAllCategoryScripts = async () => {
+      if (!teamId || !memberId) return
+      
+      setIsLoading(true)
+      try {
+        const scriptsPromises = categories.map(category => 
+          scriptService.getScripts(teamId, memberId, category)
+        )
+        
+        const results = await Promise.all(scriptsPromises)
+        
+        setCategoryData(categories.map((category, index) => ({
+          category: category,
+          scripts: results[index]
+        })))
+      } catch (err) {
+        console.error('Error loading category scripts:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadAllCategoryScripts()
+  }, [teamId, memberId])
+
+  const handleCategorySelect = async (category: Category) => {
+    setSelectedCategory(category)
     setIsLoading(true)
+    
     try {
-      // Load scripts for all categories
-      const scriptsPromises = categories.map(category => 
-        scriptService.getScripts(teamId, memberId, category)
-      )
+      if (!teamId || !memberId) {
+        throw new Error('Missing required data')
+      }
+
+      const scripts = await scriptService.getScripts(teamId, memberId, category)
       
-      const results = await Promise.all(scriptsPromises)
+      setCategoryData(prev => {
+        const existingCategoryIndex = prev.findIndex(data => data.category === category)
+        if (existingCategoryIndex !== -1) {
+          const newData = [...prev]
+          newData[existingCategoryIndex] = {
+            category: category,
+            scripts
+          }
+          return newData
+        }
+        return [...prev, { category: category, scripts }]
+      })
+
+      if (scripts.length > 0) {
+        setStep(5)
+      } else {
+        setStep(2)
+      }
+      setHistory([...history, step])
       
-      // Update categoryData with all results
-      setCategoryData(categories.map((category, index) => ({
-        category: category,
-        scripts: results[index]
-      })))
     } catch (err) {
-      console.error('Error loading category scripts:', err)
+      setError('Error loading scripts. Please try again.')
+      console.error('Script loading error:', err)
     } finally {
       setIsLoading(false)
     }
   }
-
-  loadAllCategoryScripts()
-}, [teamId, memberId]) // Dependencies
-
-  const handleCategorySelect = async (category: Category) => {
-  setSelectedCategory(category)
-  setIsLoading(true)
-  
-  try {
-    if (!teamId || !memberId) {
-      throw new Error('Missing required data')
-    }
-
-    // Fetch scripts immediately when category is selected
-    const scripts = await scriptService.getScripts(teamId, memberId, category)
-    
-    // Update category data
-    setCategoryData(prev => {
-      const existingCategoryIndex = prev.findIndex(data => data.category === category)
-      if (existingCategoryIndex !== -1) {
-        const newData = [...prev]
-        newData[existingCategoryIndex] = {
-          category: category,
-          scripts
-        }
-        return newData
-      }
-      return [...prev, { category: category, scripts }]
-    })
-
-    // Now we can check the scripts length and set the appropriate step
-    if (scripts.length > 0) {
-      setStep(5)
-    } else {
-      setStep(2)
-    }
-    setHistory([...history, step])
-    
-  } catch (err) {
-    setError('Error loading scripts. Please try again.')
-    console.error('Script loading error:', err)
-  } finally {
-    setIsLoading(false)
-  }
-}
 
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template)
@@ -194,91 +189,96 @@ useEffect(() => {
     }
   }
 
-  const handleUploadScript = async (content: string, fileName: string) => {
-  setUploadedContent(content)
-  setEditingScript({
-    id: Date.now().toString(),
-    name: fileName,
-    content: content,
-    lastEdited: new Date().toISOString(),
-    isSelected: false
-  })
-  setStep(3)
-  setHistory([...history, 3])
-}
-
-const handleScriptSave = async (content: string) => {
-  if (!teamId || !memberId || !selectedCategory) {
-    setError('Unable to save script. Please try again.')
-    return
+  const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
+    setUploadedContent(content)
+    setUploadedFileName(fileName)
+    setEditingScript({
+      id: Date.now().toString(),
+      name: customName || fileName,
+      content: content,
+      lastEdited: new Date().toISOString(),
+      isSelected: false
+    })
+    setStep(3)
+    setHistory([...history, 3])
   }
 
-  setIsLoading(true)
-  try {
-    const scriptName = selectedTemplate?.title || editingScript?.name || 'New Script'
-    let savedScript
+  const handleNameUpdate = (newName: string) => {
+    if (editingScript) {
+      setEditingScript({
+        ...editingScript,
+        name: newName
+      })
+    }
+  }
 
-    // Check if we're editing an existing script (one with a real database ID)
-    if (editingScript?.id && editingScript.id.length > 13) { // Real DB IDs are longer than timestamp IDs
-      // Update existing script
-      savedScript = await scriptService.updateScript(
-        editingScript.id,
-        teamId,
-        {
-          name: scriptName,
-          content: content,
-          memberstackId: memberId,
-          category: selectedCategory
-        }
-      )
-    } else {
-      // Create new script
-      savedScript = await scriptService.createScript(
-        teamId,
-        memberId,
-        scriptName,
-        content,
-        selectedCategory
-      )
+  const handleScriptSave = async (content: string, scriptName?: string) => {
+    if (!teamId || !memberId || !selectedCategory) {
+      setError('Unable to save script. Please try again.')
+      return
     }
 
-    setCategoryData(prev => {
-      const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
-      if (categoryIndex !== -1) {
-        const newData = [...prev]
-        if (editingScript?.id && editingScript.id.length > 13) {
-          // Update existing script
-          newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
-            script.id === editingScript.id ? savedScript : script
-          )
-        } else {
-          // Add new script
-          newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
-        }
-        return newData
-      }
-      return [...prev, {
-        category: selectedCategory,
-        scripts: [savedScript]
-      }]
-    })
+    setIsLoading(true)
+    try {
+      const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
+      let savedScript
 
-    setIsSaved(true)
-    setTimeout(() => {
-      setStep(1)
-      setSelectedCategory(null)
-      setSelectedTemplate(null)
-      setUploadedContent(null)
-      setEditingScript(null)
-      setHistory([1])
-    }, 1500)
-  } catch (err) {
-    setError('Error saving script. Please try again.')
-    console.error('Script saving error:', err)
-  } finally {
-    setIsLoading(false)
+      if (editingScript?.id && editingScript.id.length > 13) {
+        savedScript = await scriptService.updateScript(
+          editingScript.id,
+          teamId,
+          {
+            name: finalScriptName,
+            content: content,
+            memberstackId: memberId,
+            category: selectedCategory
+          }
+        )
+      } else {
+        savedScript = await scriptService.createScript(
+          teamId,
+          memberId,
+          finalScriptName,
+          content,
+          selectedCategory
+        )
+      }
+
+      setCategoryData(prev => {
+        const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
+        if (categoryIndex !== -1) {
+          const newData = [...prev]
+          if (editingScript?.id && editingScript.id.length > 13) {
+            newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
+              script.id === editingScript.id ? savedScript : script
+            )
+          } else {
+            newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
+          }
+          return newData
+        }
+        return [...prev, {
+          category: selectedCategory,
+          scripts: [savedScript]
+        }]
+      })
+
+      setIsSaved(true)
+      setTimeout(() => {
+        setStep(1)
+        setSelectedCategory(null)
+        setSelectedTemplate(null)
+        setUploadedContent(null)
+        setEditingScript(null)
+        setHistory([1])
+      }, 1500)
+    } catch (err) {
+      setError('Error saving script. Please try again.')
+      console.error('Script saving error:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
-}
 
   const handleGoBack = () => {
     if (history.length > 1) {
@@ -352,11 +352,11 @@ const handleScriptSave = async (content: string) => {
     }
   }
 
-const handleSelectScript = async (scriptId: string) => {
-    if (!teamId) return;
+  const handleSelectScript = async (scriptId: string) => {
+    if (!teamId) return
 
     try {
-      await scriptService.updateScript(scriptId, teamId, { isSelected: true });
+      await scriptService.updateScript(scriptId, teamId, { isSelected: true })
       setCategoryData(prev => {
         return prev.map(categoryData => {
           if (categoryData.category === selectedCategory) {
@@ -366,16 +366,16 @@ const handleSelectScript = async (scriptId: string) => {
                 ...script,
                 isSelected: script.id === scriptId
               }))
-            };
+            }
           }
-          return categoryData;
-        });
-      });
+          return categoryData
+        })
+      })
     } catch (err) {
-      setError('Error selecting script. Please try again.');
-      console.error('Script selection error:', err);
+      setError('Error selecting script. Please try again.')
+      console.error('Script selection error:', err)
     }
-  };
+  }
 
   if (isLoading && !selectedCategory) {
     return <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
@@ -452,6 +452,7 @@ const handleSelectScript = async (scriptId: string) => {
               onSave={handleScriptSave}
               handleGoBack={handleGoBack}
               onRename={handleRenameScript}
+              onNameUpdate={handleNameUpdate}
             />
           )}
           
