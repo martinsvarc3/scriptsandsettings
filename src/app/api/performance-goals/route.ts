@@ -17,6 +17,7 @@ export async function GET(request: Request) {
   
   try {
     const client = await getDbClient();
+    // This query already returns all fields including call_extend_allowed
     const { rows } = await client.query(
       'SELECT * FROM performance_goals WHERE team_id = $1 ORDER BY created_at DESC LIMIT 1',
       [teamId]
@@ -37,10 +38,10 @@ export async function POST(request: Request) {
       memberId,
       overall_performance_goal, 
       number_of_calls_average,
-      call_length 
+      call_length,
+      call_extend_allowed  // Added this field
     } = body;
     
-    // Require either teamId or memberId
     if ((!teamId && !memberId) || overall_performance_goal === undefined || 
         number_of_calls_average === undefined || call_length === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -48,7 +49,6 @@ export async function POST(request: Request) {
 
     const client = await getDbClient();
     
-    // If teamId exists, delete any existing goals for this team
     if (teamId) {
       await client.query(
         'DELETE FROM performance_goals WHERE team_id = $1',
@@ -56,13 +56,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Insert new goals
+    // Updated query to include call_extend_allowed
     const { rows } = await client.query(
       `INSERT INTO performance_goals 
-       (team_id, member_id, overall_performance_goal, number_of_calls_average, call_length)
-       VALUES ($1, $2, $3, $4, $5)
+       (team_id, member_id, overall_performance_goal, number_of_calls_average, call_length, call_extend_allowed)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [teamId || null, memberId || null, overall_performance_goal, number_of_calls_average, call_length]
+      [teamId || null, memberId || null, overall_performance_goal, number_of_calls_average, call_length, call_extend_allowed]
     );
     
     await client.end();
