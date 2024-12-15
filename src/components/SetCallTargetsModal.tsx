@@ -231,11 +231,11 @@ export default function SetCallTargetsModal() {
               </div>
               <div className="flex items-center space-x-3">
                 <Switch
-                  id="call-extend-toggle"
-                  checked={callExtendAllowed}
-                  onCheckedChange={setCallExtendAllowed}
-                  className="data-[state=checked]:bg-[#5b06be]"
-                />
+  id="call-extend-toggle"
+  checked={callExtendAllowed}
+  onCheckedChange={setCallExtendAllowed}
+  className="data-[state=checked]:bg-[#5b06be] data-[state=unchecked]:bg-gray-200 peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+/>
                 <span className="text-sm text-gray-600 min-w-[60px]">
                   {callExtendAllowed ? 'Enabled' : 'Disabled'}
                 </span>
