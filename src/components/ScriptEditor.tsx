@@ -6,13 +6,15 @@ import { FormattingToolbar } from '@/components/FormattingToolbar'
 import { Check } from 'lucide-react'
 import BackButton from '@/components/BackButton'
 
+// Remove the duplicate interface and use the one from types
 interface ScriptEditorProps {
   template: Template | null
   uploadedContent?: string
   editingScript: SavedScript | null
-  onSave: (script: string) => void
+  onSave: (content: string, scriptName?: string) => Promise<void>
   handleGoBack: () => void
-  onRename?: (scriptId: string, newName: string) => void
+  onRename: (scriptId: string, newName: string) => Promise<void>
+  onNameUpdate: (newName: string) => void
 }
 
 export default function ScriptEditor({
@@ -21,7 +23,8 @@ export default function ScriptEditor({
   editingScript,
   onSave,
   handleGoBack,
-  onRename
+  onRename,
+  onNameUpdate
 }: ScriptEditorProps) {
   const [script, setScript] = useState<string>('')
   const [originalScript, setOriginalScript] = useState<string>('')
@@ -51,15 +54,15 @@ export default function ScriptEditor({
   }, [template, uploadedContent, editingScript])
 
   useEffect(() => {
-    setEditableName(editingScript ? editingScript.name : (template ? template.title : 'Uploaded Script'));
-  }, [editingScript, template]);
+    setEditableName(editingScript ? editingScript.name : (template ? template.title : 'Uploaded Script'))
+  }, [editingScript, template])
 
   const handleSave = async () => {
-    if (!editorRef.current) return;
+    if (!editorRef.current) return
     
     setIsSaving(true)
     try {
-      await onSave(editorRef.current.innerHTML)
+      await onSave(editorRef.current.innerHTML, editableName)
       setShowSaveConfirmation(true)
       setTimeout(() => setShowSaveConfirmation(false), 2000)
       setOriginalScript(editorRef.current.innerHTML)
@@ -110,11 +113,14 @@ export default function ScriptEditor({
     document.execCommand('insertText', false, text)
   }
 
-  const handleNameSave = () => {
-    if (editingScript && onRename) {
-      onRename(editingScript.id, editableName);
+  const handleNameChange = (newName: string) => {
+    setEditableName(newName)
+    if (editingScript?.id && editingScript.id.length > 13) {
+      onRename(editingScript.id, newName)
+    } else {
+      onNameUpdate(newName)
     }
-  };
+  }
 
   return (
     <div className="dynamic-height-container">
@@ -123,8 +129,7 @@ export default function ScriptEditor({
           <input
             type="text"
             value={editableName}
-            onChange={(e) => setEditableName(e.target.value)}
-            onBlur={onRename ? handleNameSave : undefined}
+            onChange={(e) => handleNameChange(e.target.value)}
             className="text-[16px] md:text-[14px] sm:text-[12px] font-montserrat font-semibold text-left bg-transparent border-b border-transparent focus:border-[#5b06be] focus:outline-none"
           />
         </div>
@@ -137,18 +142,18 @@ export default function ScriptEditor({
             hasChanges={hasChanges}
           />
           <div
-  ref={editorRef}
-  contentEditable
-  onInput={handleInput}
-  onPaste={handlePaste}
-  className="scrollable-content w-full h-[calc(100vh-350px)] px-6 pt-4 pb-6 font-montserrat text-sm md:text-xs sm:text-xs text-gray-800 focus:outline-none overflow-y-auto
-    [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4
-    [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3
-    [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mb-2
-    [&_p]:mb-4 [&_p]:last:mb-0
-    scrollbar-thin scrollbar-thumb-[#5b06be] scrollbar-track-transparent hover:scrollbar-thumb-[#5b06be]/80
-    scrollbar-corner-transparent"
-/>
+            ref={editorRef}
+            contentEditable
+            onInput={handleInput}
+            onPaste={handlePaste}
+            className="scrollable-content w-full h-[calc(100vh-350px)] px-6 pt-4 pb-6 font-montserrat text-sm md:text-xs sm:text-xs text-gray-800 focus:outline-none overflow-y-auto
+              [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4
+              [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3
+              [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mb-2
+              [&_p]:mb-4 [&_p]:last:mb-0
+              scrollbar-thin scrollbar-thumb-[#5b06be] scrollbar-track-transparent hover:scrollbar-thumb-[#5b06be]/80
+              scrollbar-corner-transparent"
+          />
         </div>
       </div>
       <div className="flex items-center justify-between px-4">
