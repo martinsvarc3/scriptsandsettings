@@ -212,15 +212,6 @@ const handleNameUpdate = (newName: string) => {
   }
 }
 
-  const handleNameUpdate = (newName: string) => {
-    if (editingScript) {
-      setEditingScript({
-        ...editingScript,
-        name: newName
-      })
-    }
-  }
-
   const handleScriptSave = async (content: string, scriptName?: string) => {
   if (!teamId || !memberId || !selectedCategory) {
     setError('Unable to save script. Please try again.')
