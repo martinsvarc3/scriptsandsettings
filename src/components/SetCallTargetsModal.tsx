@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
 import Image from 'next/image'
 import { Info } from 'lucide-react'
@@ -42,6 +43,7 @@ const INITIAL_TARGET_TYPES: TargetConfig[] = [
 export default function SetCallTargetsModal() {
   const [activeCategory] = useState<'intermediate' | 'expert'>('intermediate')
   const [targets, setTargets] = useState<string[]>(INITIAL_TARGET_TYPES.map(() => ""))
+  const [callExtendAllowed, setCallExtendAllowed] = useState(true)
   const [showInfo, setShowInfo] = useState<number | null>(null)
   const [teamId, setTeamId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -65,6 +67,7 @@ export default function SetCallTargetsModal() {
                 data.number_of_calls_average.toString(),
                 data.call_length?.toString() || ""
               ])
+              setCallExtendAllowed(data.call_extend_allowed ?? true)
             }
           }
         }
@@ -108,7 +111,8 @@ export default function SetCallTargetsModal() {
           teamId,
           overall_performance_goal: Number(targets[0]),
           number_of_calls_average: Number(targets[1]),
-          call_length: Number(targets[2])
+          call_length: Number(targets[2]),
+          call_extend_allowed: callExtendAllowed
         })
       })
 
@@ -148,57 +152,99 @@ export default function SetCallTargetsModal() {
   )
 
   const renderTargetInputs = () => {
-    return INITIAL_TARGET_TYPES.map((target, index) => (
-      <div key={`${activeCategory}-${index}`} className="mb-8">
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Label
-              htmlFor={`${activeCategory}-target-${index}`}
-              className="text-[#000000] text-xs sm:text-sm font-montserrat font-semibold"
-            >
-              {target.name}
-            </Label>
-            <div className="relative">
-              <Info
-                className="w-4 h-4 text-[#5b06be] cursor-pointer hover:text-[#4a05a0] transition-colors"
-                onClick={() => setShowInfo(showInfo === index ? null : index)}
-              />
-              {showInfo === index && <InfoPopup text={target.infoText} />}
+    return (
+      <>
+        {INITIAL_TARGET_TYPES.map((target, index) => (
+          <div key={`${activeCategory}-${index}`} className="mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Label
+                  htmlFor={`${activeCategory}-target-${index}`}
+                  className="text-[#000000] text-xs sm:text-sm font-montserrat font-semibold"
+                >
+                  {target.name}
+                </Label>
+                <div className="relative">
+                  <Info
+                    className="w-4 h-4 text-[#5b06be] cursor-pointer hover:text-[#4a05a0] transition-colors"
+                    onClick={() => setShowInfo(showInfo === index ? null : index)}
+                  />
+                  {showInfo === index && <InfoPopup text={target.infoText} />}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1 h-2">
+                  <div className="absolute inset-0 bg-[#f8b922] rounded-full"></div>
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r rounded-full pointer-events-none" 
+                    style={{
+                      clipPath: `inset(0 ${100 - (Number(targets[index] || target.min) / target.max) * 100}% 0 0)`,
+                    }}
+                  >
+                    <div className={`w-full h-full ${getGradientColor(Number(targets[index] || target.min))}`}></div>
+                  </div>
+                  <input
+                    id={`${activeCategory}-target-${index}`}
+                    type="range"
+                    min={target.min}
+                    max={target.max}
+                    value={targets[index] || target.min}
+                    onChange={(e) => updateTargets(index, e.target.value)}
+                    className="absolute inset-0 w-full h-full appearance-none bg-transparent focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb]:ease-in-out [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-300 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:ease-in-out [&::-moz-range-thumb]:hover:scale-110"
+                  />
+                </div>
+                <span className="text-lg font-medium min-w-[30px]">
+                  {targets[index] || target.min}
+                </span>
+                {target.unit && (
+                  <span className="text-lg text-gray-600 min-w-[80px]">
+                    {target.unit}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 h-2">
-              <div className="absolute inset-0 bg-[#f8b922] rounded-full"></div>
-              <div 
-                className="absolute inset-0 bg-gradient-to-r rounded-full pointer-events-none" 
-                style={{
-                  clipPath: `inset(0 ${100 - (Number(targets[index] || target.min) / target.max) * 100}% 0 0)`,
-                }}
-              >
-                <div className={`w-full h-full ${getGradientColor(Number(targets[index] || target.min))}`}></div>
+        ))}
+
+        {/* Call Extension Toggle */}
+        <div className="mb-8 pt-2 border-t border-gray-100">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Label
+                  htmlFor="call-extend-toggle"
+                  className="text-[#000000] text-xs sm:text-sm font-montserrat font-semibold"
+                >
+                  Allow users to extend their calls
+                </Label>
+                <div className="relative">
+                  <Info
+                    className="w-4 h-4 text-[#5b06be] cursor-pointer hover:text-[#4a05a0] transition-colors"
+                    onClick={() => setShowInfo(showInfo === 3 ? null : 3)}
+                  />
+                  {showInfo === 3 && (
+                    <InfoPopup 
+                      text="When enabled, users can request additional time during their role-play calls if needed." 
+                    />
+                  )}
+                </div>
               </div>
-              <input
-                id={`${activeCategory}-target-${index}`}
-                type="range"
-                min={target.min}
-                max={target.max}
-                value={targets[index] || target.min}
-                onChange={(e) => updateTargets(index, e.target.value)}
-                className="absolute inset-0 w-full h-full appearance-none bg-transparent focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150 [&::-webkit-slider-thumb]:ease-in-out [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-gray-300 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:ease-in-out [&::-moz-range-thumb]:hover:scale-110"
-              />
+              <div className="flex items-center space-x-3">
+                <Switch
+                  id="call-extend-toggle"
+                  checked={callExtendAllowed}
+                  onCheckedChange={setCallExtendAllowed}
+                  className="data-[state=checked]:bg-[#5b06be]"
+                />
+                <span className="text-sm text-gray-600 min-w-[60px]">
+                  {callExtendAllowed ? 'Enabled' : 'Disabled'}
+                </span>
+              </div>
             </div>
-            <span className="text-lg font-medium min-w-[30px]">
-              {targets[index] || target.min}
-            </span>
-            {target.unit && (
-              <span className="text-lg text-gray-600 min-w-[80px]">
-                {target.unit}
-              </span>
-            )}
           </div>
         </div>
-      </div>
-    ))
+      </>
+    )
   }
 
   return (
