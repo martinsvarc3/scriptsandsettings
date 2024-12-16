@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import ScriptUploader from '@/components/ScriptUploader'
+import SetCallTargetsModal from '@/components/SetCallTargetsModal'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import { getMemberData } from "@/utils/memberstack"
 import { scriptService } from '@/services/scriptService'
