@@ -214,7 +214,7 @@ const handleNameUpdate = (newName: string) => {
 }
 
 const handleScriptSave = async (content: string, scriptName?: string) => {
-  if (!teamId || !memberId || !selectedCategory) {
+  if (!memberId || !selectedCategory) {  // Removed teamId check since we don't need it
     setError('Unable to save script. Please try again.')
     return
   }
@@ -224,14 +224,10 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
     const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
     let savedScript
 
-    const isFirstInCategory = !categoryData.find(
-      data => data.category === selectedCategory
-    )?.scripts.length
-
     if (editingScript?.id && editingScript.id.length > 13) {
       savedScript = await scriptService.updateScript(
         editingScript.id,
-        teamId,
+        memberId,  // Pass memberId instead of teamId
         {
           name: finalScriptName,
           content: content,
@@ -241,12 +237,11 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
       )
     } else {
       savedScript = await scriptService.createScript(
-        teamId,
+        memberId,  // Pass memberId instead of teamId
         memberId,
         finalScriptName,
         content,
-        selectedCategory,
-        isFirstInCategory 
+        selectedCategory
       )
     }
 
