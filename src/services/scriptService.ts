@@ -3,13 +3,10 @@ import { SavedScript, Category } from '@/types';
 interface ScriptUpdateParams {
   name?: string;
   content?: string;
-  isSelected?: boolean;
-  isPrimary?: boolean;
   memberstackId?: string;
   category?: Category;
 }
 
-// src/services/scriptService.ts
 export const scriptService = {
   async getScripts(teamId: string, memberstackId: string, category?: Category): Promise<SavedScript[]> {
     const params = new URLSearchParams({
@@ -27,40 +24,34 @@ export const scriptService = {
     return response.json();
   },
 
-async createScript(
-  memberId: string,
-  memberstackId: string,
-  name: string,
-  content: string,
-  category: Category
-): Promise<SavedScript> {
-  const payload = {
-    memberstackId,
-    name,
-    content,
-    category
-  };
-  console.log('Sending request to /api/scripts with payload:', payload);
-  
-  const response = await fetch('/api/scripts', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+  async createScript(
+    memberId: string,
+    memberstackId: string,
+    name: string,
+    content: string,
+    category: Category
+  ): Promise<SavedScript> {
+    const response = await fetch('/api/scripts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        memberstackId,
+        name,
+        content,
+        category
+      })
+    });
 
-  const data = await response.json();
-  
-  if (!response.ok) {
-    console.error('API Error Response:', data);
-    throw new Error(data.error || 'Failed to create script');
-  }
-  
-  return data;
-}
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create script');
+    }
+    return response.json();
+  },
 
   async updateScript(
     id: string,
-    teamId: string,
+    memberstackId: string,
     updates: ScriptUpdateParams
   ): Promise<SavedScript> {
     const response = await fetch('/api/scripts', {
@@ -68,9 +59,11 @@ async createScript(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
+        memberstackId,
         ...updates
       })
     });
+
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to update script');
@@ -78,30 +71,16 @@ async createScript(
     return response.json();
   },
 
-  async deleteScript(id: string, teamId: string): Promise<{ success: boolean }> {
-    const params = new URLSearchParams({ 
-      id,
-      memberstackId: teamId // Using teamId as memberstackId for backward compatibility
-    });
+  async deleteScript(id: string, memberstackId: string): Promise<{ success: boolean }> {
+    const params = new URLSearchParams({ id, memberstackId });
     const response = await fetch(`/api/scripts?${params}`, {
       method: 'DELETE'
     });
+
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to delete script');
     }
     return response.json();
-  },
-
-  async setPrimaryScript(
-    id: string,
-    teamId: string,
-    category: Category,
-    isPrimary: boolean
-  ): Promise<SavedScript> {
-    return this.updateScript(id, teamId, {
-      category,
-      isPrimary
-    });
   }
 };
