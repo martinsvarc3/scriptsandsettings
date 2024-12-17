@@ -189,7 +189,8 @@ export default function ScriptUploader() {
     }
   }
 
- const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
+ // In ScriptUploader.tsx, find this function:
+const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
   setUploadedContent(content)
   setUploadedFileName(fileName)
   setEditingScript({
@@ -197,7 +198,10 @@ export default function ScriptUploader() {
     name: customName || fileName,
     content: content,
     lastEdited: new Date().toISOString(),
-    isSelected: false
+    isSelected: false,
+    // Add these required fields:
+    isPrimary: false, // Default to false for new uploads
+    category: selectedCategory || 'Wholesaling' // Use selected category or default
   })
   setStep(3)
   setHistory([...history, 3])
