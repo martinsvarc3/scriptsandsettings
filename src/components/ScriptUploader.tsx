@@ -213,26 +213,27 @@ const handleNameUpdate = (newName: string) => {
   }
 }
 
+// Replace the entire handleScriptSave function in ScriptUploader.tsx
 const handleScriptSave = async (content: string, scriptName?: string) => {
   console.log('Starting save attempt with:', { 
     memberId, 
     selectedCategory,
     hasEditingScript: !!editingScript,
-    scriptName
+    scriptName 
   });
   
   if (!memberId || !selectedCategory) {
     console.error('Missing required fields:', { memberId, selectedCategory });
-    setError('Unable to save script. Please try again.')
-    return
+    setError('Unable to save script. Please try again.');
+    return;
   }
 
-  setIsLoading(true)
+  setIsLoading(true);
+  
   try {
-    const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
-    let savedScript
+    const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script';
+    let savedScript;
 
-    // If we're editing an existing script
     if (editingScript?.id && editingScript.id.length > 13) {
       console.log('Updating existing script:', editingScript.id);
       savedScript = await scriptService.updateScript(
@@ -244,9 +245,8 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
           memberstackId: memberId,
           category: selectedCategory
         }
-      )
+      );
     } else {
-      // Creating a new script
       console.log('Creating new script with:', {
         memberId,
         name: finalScriptName,
@@ -259,52 +259,46 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
         finalScriptName,
         content,
         selectedCategory
-      )
+      );
     }
 
     console.log('Script saved successfully:', savedScript);
 
-    // Update category data
     setCategoryData(prev => {
-      const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
+      const categoryIndex = prev.findIndex(data => data.category === selectedCategory);
       if (categoryIndex !== -1) {
-        const newData = [...prev]
+        const newData = [...prev];
         if (editingScript?.id && editingScript.id.length > 13) {
           newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
             script.id === editingScript.id ? savedScript : script
-          )
+          );
         } else {
-          newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
+          newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript];
         }
-        return newData
+        return newData;
       }
       return [...prev, {
         category: selectedCategory,
         scripts: [savedScript]
-      }]
-    })
-
-    setIsSaved(true)
-    setTimeout(() => {
-      setStep(1)
-      setSelectedCategory(null)
-      setSelectedTemplate(null)
-      setUploadedContent(null)
-      setEditingScript(null)
-      setHistory([1])
-    }, 1500)
-  } catch (err: any) {
-    console.error('Save error details:', {
-      error: err,
-      message: err.message,
-      response: err.response
+      }];
     });
-    setError('Error saving script. Please try again.')
-    console.error('Script saving error:', err)
+
+    setIsSaved(true);
+    setTimeout(() => {
+      setStep(1);
+      setSelectedCategory(null);
+      setSelectedTemplate(null);
+      setUploadedContent(null);
+      setEditingScript(null);
+      setHistory([1]);
+    }, 1500);
+  } catch (err) {
+    console.error('Save error details:', err);
+    setError('Error saving script. Please try again.');
   } finally {
-    setIsLoading(false)
+    setIsLoading(false);
   }
-}
+};
 
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
