@@ -492,18 +492,17 @@ const handlePrimaryScript = async (scriptId: string, isPrimary: boolean) => {
 )}
           
           {step === 5 && selectedCategory && (
-            <ScriptFolder
-              category={selectedCategory}
-              scripts={categoryData.find(data => data.category === selectedCategory)?.scripts || []}
-              onEdit={handleEditScript}
-              onRemove={handleRemoveScript}
-              onSelect={handleSelectScript}
-              onUploadNew={() => setStep(2)}
-              onRename={handleRenameScript}
-              onBack={handleGoBack}
-              onPrimaryChange={handlePrimaryScript}
-            />
-          )}
+  <ScriptFolder
+    category={selectedCategory}
+    scripts={categoryData.find(data => data.category === selectedCategory)?.scripts || []}
+    onEdit={handleEditScript}
+    onRemove={handleRemoveScript}
+    onSelect={handleSelectScript}
+    onUploadNew={() => setStep(2)}
+    onRename={handleRenameScript}
+    onBack={handleGoBack}
+  />
+)}
         </div>
       </div>
       
