@@ -98,15 +98,26 @@ export default function ScriptFolder({
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <div className="flex items-center space-x-2 ml-2">
+                    <div className="flex items-center">
                       <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          className="form-radio w-4 h-4 text-[#5b06be] border-gray-300 focus:ring-[#5b06be]"
-                          name={`primary-${category}`}
-                          checked={script.isPrimary}
-                          onChange={() => handlePrimaryChange(script.id, script.isPrimary || false)}
-                        />
+                        <div className="relative">
+                          <input
+                            type="radio"
+                            name={`primary-${category}`}
+                            checked={script.isPrimary}
+                            onChange={() => handlePrimaryChange(script.id, script.isPrimary || false)}
+                            className="peer hidden"
+                          />
+                          <div className="w-8 h-8 rounded-full bg-white hover:bg-gray-50 transition-colors flex items-center justify-center">
+                            <div 
+                              className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+                                script.isPrimary 
+                                  ? 'border-[#5b06be] bg-[#5b06be]' 
+                                  : 'border-gray-300 bg-white'
+                              }`}
+                            />
+                          </div>
+                        </div>
                         <span className="ml-2 text-sm font-montserrat text-gray-700">
                           Make Primary
                         </span>
