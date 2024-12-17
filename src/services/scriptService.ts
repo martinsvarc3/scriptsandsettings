@@ -9,6 +9,7 @@ interface ScriptUpdateParams {
   category?: Category;
 }
 
+// src/services/scriptService.ts
 export const scriptService = {
   async getScripts(teamId: string, memberstackId: string, category?: Category): Promise<SavedScript[]> {
     const params = new URLSearchParams({
