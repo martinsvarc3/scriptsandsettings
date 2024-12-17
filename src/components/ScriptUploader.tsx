@@ -212,7 +212,7 @@ const handleNameUpdate = (newName: string) => {
   }
 }
 
-  const handleScriptSave = async (content: string, scriptName?: string) => {
+const handleScriptSave = async (content: string, scriptName?: string) => {
   if (!teamId || !memberId || !selectedCategory) {
     setError('Unable to save script. Please try again.')
     return
@@ -223,26 +223,31 @@ const handleNameUpdate = (newName: string) => {
     const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
     let savedScript
 
-      if (editingScript?.id && editingScript.id.length > 13) {
-        savedScript = await scriptService.updateScript(
-          editingScript.id,
-          teamId,
-          {
-            name: finalScriptName,
-            content: content,
-            memberstackId: memberId,
-            category: selectedCategory
-          }
-        )
-      } else {
-        savedScript = await scriptService.createScript(
-          teamId,
-          memberId,
-          finalScriptName,
-          content,
-          selectedCategory
-        )
-      }
+    const isFirstInCategory = !categoryData.find(
+      data => data.category === selectedCategory
+    )?.scripts.length
+
+    if (editingScript?.id && editingScript.id.length > 13) {
+      savedScript = await scriptService.updateScript(
+        editingScript.id,
+        teamId,
+        {
+          name: finalScriptName,
+          content: content,
+          memberstackId: memberId,
+          category: selectedCategory
+        }
+      )
+    } else {
+      savedScript = await scriptService.createScript(
+        teamId,
+        memberId,
+        finalScriptName,
+        content,
+        selectedCategory,
+        isFirstInCategory 
+      )
+    }
 
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
@@ -377,6 +382,35 @@ const handleNameUpdate = (newName: string) => {
     }
   }
 
+const handlePrimaryScript = async (scriptId: string, isPrimary: boolean) => {
+  if (!teamId) return
+
+  try {
+    // Update the script's primary status
+    await scriptService.updateScript(scriptId, teamId, { isPrimary })
+
+    // Update local state
+    setCategoryData(prev => {
+      return prev.map(categoryData => {
+        if (categoryData.category === selectedCategory) {
+          return {
+            ...categoryData,
+            scripts: categoryData.scripts.map(script => ({
+              ...script,
+              // Set the clicked script as primary and remove primary from others
+              isPrimary: script.id === scriptId ? isPrimary : false
+            }))
+          }
+        }
+        return categoryData
+      })
+    })
+  } catch (err) {
+    setError('Error updating primary script. Please try again.')
+    console.error('Primary script update error:', err)
+  }
+}
+
   if (isLoading && !selectedCategory) {
     return <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
   }
@@ -466,6 +500,7 @@ const handleNameUpdate = (newName: string) => {
               onUploadNew={() => setStep(2)}
               onRename={handleRenameScript}
               onBack={handleGoBack}
+              onPrimaryChange={handlePrimaryScript}
             />
           )}
         </div>
