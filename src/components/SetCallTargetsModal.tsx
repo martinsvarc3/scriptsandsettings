@@ -45,40 +45,40 @@ export default function SetCallTargetsModal() {
   const [targets, setTargets] = useState<string[]>(INITIAL_TARGET_TYPES.map(() => ""))
   const [callExtendAllowed, setCallExtendAllowed] = useState(true)
   const [showInfo, setShowInfo] = useState<number | null>(null)
-  const [teamId, setTeamId] = useState<string | null>(null)
+  const [memberId, setMemberId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const popupRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const initializeMemberData = async () => {
-      try {
-        const { teamId } = await getMemberData()
-        setTeamId(teamId)
-        
-        if (teamId) {
-          const response = await fetch(`/api/performance-goals?teamId=${teamId}`)
-          if (response.ok) {
-            const data = await response.json()
-            if (data) {
-              setTargets([
-                data.overall_performance_goal.toString(),
-                data.number_of_calls_average.toString(),
-                data.call_length?.toString() || ""
-              ])
-              setCallExtendAllowed(data.call_extend_allowed ?? true)
-            }
+useEffect(() => {
+  const initializeMemberData = async () => {
+    try {
+      const { memberstackId } = await getMemberData()
+      setMemberId(memberstackId)
+      
+      if (memberstackId) {
+        const response = await fetch(`/api/performance-goals?memberstackId=${memberstackId}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data) {
+            setTargets([
+              data.overall_performance_goal.toString(),
+              data.number_of_calls_average.toString(),
+              data.call_length?.toString() || ""
+            ])
+            setCallExtendAllowed(data.call_extend_allowed ?? true)
           }
         }
-      } catch (err) {
-        console.error('Member data error:', err)
-        setError('Error loading member data. Please refresh the page.')
       }
+    } catch (err) {
+      console.error('Member data error:', err)
+      setError('Error loading member data. Please refresh the page.')
     }
+  }
 
-    initializeMemberData()
-  }, [])
+  initializeMemberData()
+}, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -91,44 +91,44 @@ export default function SetCallTargetsModal() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!teamId) {
-      setError('Team ID not available. Please refresh the page.')
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch('/api/performance-goals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          teamId,
-          overall_performance_goal: Number(targets[0]),
-          number_of_calls_average: Number(targets[1]),
-          call_length: Number(targets[2]),
-          call_extend_allowed: callExtendAllowed
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to save targets')
-      }
-
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
-    } catch (err) {
-      console.error('Error saving targets:', err)
-      setError('Failed to save targets. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (!memberId) {
+    setError('Member ID not available. Please refresh the page.')
+    return
   }
+
+  setIsLoading(true)
+  setError(null)
+
+  try {
+    const response = await fetch('/api/performance-goals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        memberstackId: memberId,
+        overall_performance_goal: Number(targets[0]),
+        number_of_calls_average: Number(targets[1]),
+        call_length: Number(targets[2]),
+        call_extend_allowed: callExtendAllowed
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to save targets')
+    }
+
+    setSaveSuccess(true)
+    setTimeout(() => setSaveSuccess(false), 3000)
+  } catch (err) {
+    console.error('Error saving targets:', err)
+    setError('Failed to save targets. Please try again.')
+  } finally {
+    setIsLoading(false)
+  }
+}
 
   const getGradientColor = (value: number): string => {
     if (value < 50) return 'from-[#50c2aa] to-[#50c2aa]'
