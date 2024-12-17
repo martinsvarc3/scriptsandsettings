@@ -248,7 +248,8 @@ export default function SetCallTargetsModal() {
   }
 
   return (
-    <div className="w-full max-w-[600px] bg-white flex flex-col rounded-[20px] overflow-hidden px-3 sm:px-5 py-2 sm:py-3 relative">
+  <div className="relative">
+    <div className="w-full max-w-[600px] bg-white flex flex-col rounded-[20px] overflow-hidden px-3 sm:px-5 py-2 sm:py-3 relative opacity-50">
       <div className="w-full bg-white rounded-[20px] px-4 py-2 sm:py-3">
         <div className="flex items-start space-x-2 -mt-1">
           <div className="flex-shrink-0 mt-[2px]">
@@ -305,5 +306,18 @@ export default function SetCallTargetsModal() {
         </div>
       </motion.div>
     </div>
-  )
-}
+
+    {/* Blur overlay with lock icon and text */}
+    <div className="absolute inset-0 backdrop-blur-[2px] bg-white/30 rounded-[20px] flex flex-col items-center justify-center gap-4">
+      <Image
+        src="https://res.cloudinary.com/dmbzcxhjn/image/upload/6757257c556bbe29ac199a32_Team_View_icon_duha_svjfrk.png"
+        alt="Lock icon"
+        width={48}
+        height={48}
+      />
+      <p className="text-[#000000] text-center text-sm sm:text-base font-montserrat font-semibold px-4">
+        Start Building Your Team to Use Advanced Functions
+      </p>
+    </div>
+  </div>
+)
