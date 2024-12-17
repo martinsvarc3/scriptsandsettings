@@ -34,24 +34,29 @@ export default function ScriptFolder({
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center space-x-3">
+    <div className="space-y-4">
+      <div className="flex items-center space-x-4">
         <button
           onClick={onBack}
-          className="p-2.5 rounded-[200px] hover:bg-gray-50 transition-colors border-2 border-[#f2f3f8] bg-white"
+          className="p-2.5 rounded-[200px] hover:bg-gray-50 transition-all duration-300 border-2 border-[#f2f3f8] bg-white shadow-sm hover:shadow-md"
           aria-label="Go back"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
-        <h2 className="text-base font-semibold font-montserrat">{category} Scripts</h2>
+        <h2 className="text-lg font-semibold font-montserrat bg-gradient-to-r from-[#5b06be] to-[#8b3bff] bg-clip-text text-transparent">
+          {category} Scripts
+        </h2>
       </div>
-      <div className="scrollable-content space-y-3 max-h-[400px] overflow-y-auto overflow-x-hidden w-full">
+      <div className="scrollable-content space-y-4 max-h-[400px] overflow-y-auto overflow-x-hidden w-full pr-2">
         {scripts.map((script) => (
-          <div key={script.id} className="bg-[#f2f3f8] p-4 rounded-[20px] border border-[#d1d1d1]">
-            <div className="flex flex-col space-y-2">
+          <div 
+            key={script.id} 
+            className="bg-white p-5 rounded-[24px] border border-[#f2f3f8] shadow-sm hover:shadow-md transition-all duration-300"
+          >
+            <div className="flex flex-col space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <input
                       type="text"
                       value={script.name}
@@ -62,8 +67,8 @@ export default function ScriptFolder({
                       onBlur={() => setEditingNameId(null)}
                       className={`font-montserrat font-semibold text-sm truncate w-full bg-transparent ${
                         editingNameId === script.id
-                          ? 'border-b border-gray-300 focus:outline-none focus:border-[#5b06be]'
-                          : 'border-b border-transparent'
+                          ? 'border-b-2 border-[#5b06be] focus:outline-none'
+                          : 'border-b-2 border-transparent'
                       }`}
                       readOnly={editingNameId !== script.id}
                     />
@@ -75,31 +80,33 @@ export default function ScriptFolder({
                           setEditingNameId(script.id);
                         }
                       }}
-                      className="p-1 rounded-full bg-white hover:bg-gray-50 transition-colors flex-shrink-0"
+                      className="p-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-all duration-300 flex-shrink-0"
                     >
                       {editingNameId === script.id ? (
                         <Save className="w-4 h-4 text-[#5b06be]" />
                       ) : (
-                        <PenLine className="w-4 h-4 text-gray-500" />
+                        <PenLine className="w-4 h-4 text-gray-400 hover:text-[#5b06be]" />
                       )}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1 mb-2">Last edited: {new Date(script.lastEdited).toLocaleString()}</p>
-                  <div className="flex items-center space-x-2">
+                  <p className="text-xs text-gray-400 mt-1 mb-3 font-montserrat">
+                    Last edited: {new Date(script.lastEdited).toLocaleString()}
+                  </p>
+                  <div className="flex items-center space-x-3">
                     <button
                       onClick={() => onEdit(script)}
-                      className="p-2 rounded-full bg-white hover:bg-gray-50 transition-colors"
+                      className="p-2.5 rounded-full bg-gray-50 hover:bg-gray-100 transition-all duration-300 group"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Edit className="w-4 h-4 text-gray-400 group-hover:text-[#5b06be]" />
                     </button>
                     <button
                       onClick={() => onRemove(script.id)}
-                      className="p-2 rounded-full bg-white hover:bg-gray-50 transition-colors"
+                      className="p-2.5 rounded-full bg-gray-50 hover:bg-red-50 transition-all duration-300 group"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
                     </button>
-                    <div className="flex items-center">
-                      <label className="inline-flex items-center cursor-pointer">
+                    <div className="flex items-center pl-1">
+                      <label className="inline-flex items-center cursor-pointer group">
                         <div className="relative">
                           <input
                             type="radio"
@@ -108,17 +115,17 @@ export default function ScriptFolder({
                             onChange={() => handlePrimaryChange(script.id, script.isPrimary || false)}
                             className="peer hidden"
                           />
-                          <div className="w-8 h-8 rounded-full bg-white hover:bg-gray-50 transition-colors flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-[#5b06be10] transition-all duration-300 flex items-center justify-center">
                             <div 
-                              className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+                              className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${
                                 script.isPrimary 
-                                  ? 'border-[#5b06be] bg-[#5b06be]' 
-                                  : 'border-gray-300 bg-white'
+                                  ? 'border-[#5b06be] bg-[#5b06be] scale-100' 
+                                  : 'border-gray-300 bg-white scale-90 group-hover:border-[#5b06be]'
                               }`}
                             />
                           </div>
                         </div>
-                        <span className="ml-2 text-sm font-montserrat text-gray-700">
+                        <span className="ml-3 text-sm font-montserrat text-gray-600 group-hover:text-[#5b06be] transition-all duration-300">
                           Make Primary
                         </span>
                       </label>
@@ -132,7 +139,9 @@ export default function ScriptFolder({
       </div>
       <button
         onClick={onUploadNew}
-        className="w-full bg-white text-black h-[45px] px-3 rounded-[20px] font-montserrat font-semibold transition-all duration-300 flex items-center justify-center text-xs sm:text-sm hover:border-2 hover:border-[#5b06be] border-2 border-[#f2f3f8]"
+        className="w-full bg-gradient-to-r from-[#5b06be] to-[#8b3bff] text-white h-[50px] px-4 rounded-[24px] 
+                 font-montserrat font-semibold transition-all duration-300 flex items-center justify-center 
+                 text-sm hover:shadow-lg hover:from-[#6507d2] hover:to-[#9544ff] transform hover:-translate-y-0.5"
       >
         Upload New Script or Choose Template
       </button>
