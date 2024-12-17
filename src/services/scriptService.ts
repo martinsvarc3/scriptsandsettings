@@ -4,6 +4,7 @@ interface ScriptUpdateParams {
   name?: string;
   content?: string;
   isSelected?: boolean;
+  isPrimary?: boolean;
   memberstackId?: string;
   category?: Category;
 }
@@ -31,7 +32,8 @@ export const scriptService = {
     memberstackId: string,
     name: string,
     content: string,
-    category: Category
+    category: Category,
+    isPrimary: boolean = false
   ): Promise<SavedScript> {
     const response = await fetch('/api/scripts', {
       method: 'POST',
@@ -41,7 +43,8 @@ export const scriptService = {
         memberstackId,
         name,
         content,
-        category
+        category,
+        isPrimary
       })
     });
 
@@ -88,5 +91,25 @@ export const scriptService = {
     }
 
     return response.json();
+  },
+
+  async setPrimaryScript(
+    id: string,
+    teamId: string,
+    category: Category,
+    isPrimary: boolean
+  ): Promise<SavedScript> {
+    // First, if making a script primary, remove primary status from other scripts in the category
+    if (isPrimary) {
+      await this.updateScript(id, teamId, {
+        category,
+        isPrimary: false
+      });
+    }
+
+    // Then update the target script
+    return this.updateScript(id, teamId, {
+      isPrimary
+    });
   }
 };
