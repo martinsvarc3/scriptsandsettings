@@ -34,15 +34,13 @@ export default function ScriptUploader() {
 
   // Member state
   const [memberId, setMemberId] = useState<string | null>(null)
-  const [teamId, setTeamId] = useState<string | null>(null)
 
   // Initialize member data
   useEffect(() => {
     const initializeMemberData = async () => {
       try {
-        const { memberstackId, teamId } = await getMemberData()
+        const { memberstackId } = await getMemberData()
         setMemberId(memberstackId)
-        setTeamId(teamId)
       } catch (err) {
         setError('Error loading member data. Please refresh the page.')
         console.error('Member data error:', err)
@@ -70,11 +68,11 @@ export default function ScriptUploader() {
   // Load scripts when category is selected
   useEffect(() => {
     const loadScripts = async () => {
-      if (!selectedCategory || !teamId || !memberId) return
+      if (!selectedCategory || !memberId) return
       
       setIsLoading(true)
       try {
-        const scripts = await scriptService.getScripts(teamId, memberId, selectedCategory)
+        const scripts = await scriptService.getScripts(memberId, selectedCategory)
         setCategoryData(prev => {
           const existingCategoryIndex = prev.findIndex(data => data.category === selectedCategory)
           if (existingCategoryIndex !== -1) {
@@ -96,17 +94,17 @@ export default function ScriptUploader() {
     }
 
     loadScripts()
-  }, [selectedCategory, teamId, memberId])
+  }, [selectedCategory, memberId])
 
   // Load all category scripts
   useEffect(() => {
     const loadAllCategoryScripts = async () => {
-      if (!teamId || !memberId) return
+      if (!memberId) return
       
       setIsLoading(true)
       try {
         const scriptsPromises = categories.map(category => 
-          scriptService.getScripts(teamId, memberId, category)
+          scriptService.getScripts(memberId, category)
         )
         
         const results = await Promise.all(scriptsPromises)
@@ -123,18 +121,18 @@ export default function ScriptUploader() {
     }
 
     loadAllCategoryScripts()
-  }, [teamId, memberId])
+  }, [memberId])
 
-  const handleCategorySelect = async (category: Category) => {
+const handleCategorySelect = async (category: Category) => {
     setSelectedCategory(category)
     setIsLoading(true)
     
     try {
-      if (!teamId || !memberId) {
+      if (!memberId) {
         throw new Error('Missing required data')
       }
 
-      const scripts = await scriptService.getScripts(teamId, memberId, category)
+      const scripts = await scriptService.getScripts(memberId, category)
       
       setCategoryData(prev => {
         const existingCategoryIndex = prev.findIndex(data => data.category === category)
@@ -189,116 +187,113 @@ export default function ScriptUploader() {
     }
   }
 
- // In ScriptUploader.tsx, find this function:
-const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
-  setUploadedContent(content)
-  setUploadedFileName(fileName)
-  setEditingScript({
-    id: Date.now().toString(),
-    name: customName || fileName,
-    content: content,
-    lastEdited: new Date().toISOString(),
-    category: selectedCategory || 'Wholesaling'
-  })
-  setStep(3)
-  setHistory([...history, 3])
-}
-
-const handleNameUpdate = (newName: string) => {
-  if (editingScript) {
+  const handleUploadScript = async (content: string, fileName: string, customName?: string) => {
+    setUploadedContent(content)
+    setUploadedFileName(fileName)
     setEditingScript({
-      ...editingScript,
-      name: newName
+      id: Date.now().toString(),
+      name: customName || fileName,
+      content: content,
+      lastEdited: new Date().toISOString(),
+      category: selectedCategory || 'Wholesaling'
     })
-  }
-}
-
-// Replace the entire handleScriptSave function in ScriptUploader.tsx
-const handleScriptSave = async (content: string, scriptName?: string) => {
-  console.log('Starting save attempt with:', { 
-    memberId, 
-    selectedCategory,
-    hasEditingScript: !!editingScript,
-    scriptName 
-  });
-  
-  if (!memberId || !selectedCategory) {
-    console.error('Missing required fields:', { memberId, selectedCategory });
-    setError('Unable to save script. Please try again.');
-    return;
+    setStep(3)
+    setHistory([...history, 3])
   }
 
-  setIsLoading(true);
-  
-  try {
-    const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script';
-    let savedScript;
+  const handleNameUpdate = (newName: string) => {
+    if (editingScript) {
+      setEditingScript({
+        ...editingScript,
+        name: newName
+      })
+    }
+  }
 
-    if (editingScript?.id && editingScript.id.length > 13) {
-      console.log('Updating existing script:', editingScript.id);
-      savedScript = await scriptService.updateScript(
-        editingScript.id,
-        memberId,
-        {
-          name: finalScriptName,
-          content: content,
-          memberstackId: memberId,
-          category: selectedCategory
-        }
-      );
-    } else {
-      console.log('Creating new script with:', {
-        memberId,
-        name: finalScriptName,
-        category: selectedCategory
-      });
-      
-      savedScript = await scriptService.createScript(
-        memberId,
-        memberId,
-        finalScriptName,
-        content,
-        selectedCategory
-      );
+  const handleScriptSave = async (content: string, scriptName?: string) => {
+    console.log('Starting save attempt with:', { 
+      memberId, 
+      selectedCategory,
+      hasEditingScript: !!editingScript,
+      scriptName 
+    })
+    
+    if (!memberId || !selectedCategory) {
+      console.error('Missing required fields:', { memberId, selectedCategory })
+      setError('Unable to save script. Please try again.')
+      return
     }
 
-    console.log('Script saved successfully:', savedScript);
+    setIsLoading(true)
+    
+    try {
+      const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
+      let savedScript
 
-    setCategoryData(prev => {
-      const categoryIndex = prev.findIndex(data => data.category === selectedCategory);
-      if (categoryIndex !== -1) {
-        const newData = [...prev];
-        if (editingScript?.id && editingScript.id.length > 13) {
-          newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
-            script.id === editingScript.id ? savedScript : script
-          );
-        } else {
-          newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript];
-        }
-        return newData;
+      if (editingScript?.id && editingScript.id.length > 13) {
+        console.log('Updating existing script:', editingScript.id)
+        savedScript = await scriptService.updateScript(
+          editingScript.id,
+          memberId,
+          {
+            name: finalScriptName,
+            content: content,
+            memberstackId: memberId,
+            category: selectedCategory
+          }
+        )
+      } else {
+        console.log('Creating new script with:', {
+          memberId,
+          name: finalScriptName,
+          category: selectedCategory
+        })
+        
+        savedScript = await scriptService.createScript(
+          memberId,
+          finalScriptName,
+          content,
+          selectedCategory
+        )
       }
-      return [...prev, {
-        category: selectedCategory,
-        scripts: [savedScript]
-      }];
-    });
 
-    setIsSaved(true);
-    setTimeout(() => {
-      setStep(1);
-      setSelectedCategory(null);
-      setSelectedTemplate(null);
-      setUploadedContent(null);
-      setEditingScript(null);
-      setHistory([1]);
-    }, 1500);
-  } catch (err) {
-    console.error('Save error details:', err);
-    setError('Error saving script. Please try again.');
-  } finally {
-    setIsLoading(false);
+      console.log('Script saved successfully:', savedScript)
+
+      setCategoryData(prev => {
+        const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
+        if (categoryIndex !== -1) {
+          const newData = [...prev]
+          if (editingScript?.id && editingScript.id.length > 13) {
+            newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
+              script.id === editingScript.id ? savedScript : script
+            )
+          } else {
+            newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
+          }
+          return newData
+        }
+        return [...prev, {
+          category: selectedCategory,
+          scripts: [savedScript]
+        }]
+      })
+
+      setIsSaved(true)
+      setTimeout(() => {
+        setStep(1)
+        setSelectedCategory(null)
+        setSelectedTemplate(null)
+        setUploadedContent(null)
+        setEditingScript(null)
+        setHistory([1])
+      }, 1500)
+    } catch (err) {
+      console.error('Save error details:', err)
+      setError('Error saving script. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
-};
 
   const handleGoBack = () => {
     if (history.length > 1) {
@@ -327,10 +322,10 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
   }
 
   const handleRemoveScript = async (scriptId: string) => {
-    if (!teamId) return
+    if (!memberId) return
 
     try {
-      await scriptService.deleteScript(scriptId, teamId)
+      await scriptService.deleteScript(scriptId, memberId)
       setCategoryData(prev => {
         return prev.map(categoryData => {
           if (categoryData.category === selectedCategory) {
@@ -349,10 +344,17 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
   }
 
   const handleRenameScript = async (scriptId: string, newName: string) => {
-    if (!teamId) return
+    if (!memberId) return
 
     try {
-      const updatedScript = await scriptService.updateScript(scriptId, teamId, { name: newName })
+      const updatedScript = await scriptService.updateScript(
+        scriptId,
+        memberId,
+        {
+          name: newName,
+          memberstackId: memberId
+        }
+      )
       setCategoryData(prev => {
         return prev.map(categoryData => {
           if (categoryData.category === selectedCategory) {
@@ -373,26 +375,25 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
   }
 
   const handleSelectScript = async (scriptId: string) => {
-  if (!memberId || !selectedCategory) return
+    if (!memberId || !selectedCategory) return
 
-  try {
-    await scriptService.updateScript(
-      scriptId, 
-      memberId,
-      {
-        memberstackId: memberId,
-        category: selectedCategory
-      }
-    )
-    // We're just keeping the script in state without any selection status
-    setCategoryData(prev => {
-      return prev.map(categoryData => categoryData)
-    })
-  } catch (err) {
-    setError('Error selecting script. Please try again.')
-    console.error('Script selection error:', err)
+    try {
+      await scriptService.updateScript(
+        scriptId, 
+        memberId,
+        {
+          memberstackId: memberId,
+          category: selectedCategory
+        }
+      )
+      setCategoryData(prev => {
+        return prev.map(categoryData => categoryData)
+      })
+    } catch (err) {
+      setError('Error selecting script. Please try again.')
+      console.error('Script selection error:', err)
+    }
   }
-}
 
   if (isLoading && !selectedCategory) {
     return <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
@@ -462,29 +463,29 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
           )}
           
           {step === 3 && (selectedTemplate || uploadedContent || editingScript) && (
-  <ScriptEditor
-    template={selectedTemplate}
-    uploadedContent={uploadedContent || undefined}
-    editingScript={editingScript}
-    onSave={handleScriptSave}
-    handleGoBack={handleGoBack}
-    onRename={handleRenameScript}
-    onNameUpdate={handleNameUpdate}
-  />
-)}
+            <ScriptEditor
+              template={selectedTemplate}
+              uploadedContent={uploadedContent || undefined}
+              editingScript={editingScript}
+              onSave={handleScriptSave}
+              handleGoBack={handleGoBack}
+              onRename={handleRenameScript}
+              onNameUpdate={handleNameUpdate}
+            />
+          )}
           
           {step === 5 && selectedCategory && (
-  <ScriptFolder
-    category={selectedCategory}
-    scripts={categoryData.find(data => data.category === selectedCategory)?.scripts || []}
-    onEdit={handleEditScript}
-    onRemove={handleRemoveScript}
-    onSelect={handleSelectScript}
-    onUploadNew={() => setStep(2)}
-    onRename={handleRenameScript}
-    onBack={handleGoBack}
-  />
-)}
+            <ScriptFolder
+              category={selectedCategory}
+              scripts={categoryData.find(data => data.category === selectedCategory)?.scripts || []}
+              onEdit={handleEditScript}
+              onRemove={handleRemoveScript}
+              onSelect={handleSelectScript}
+              onUploadNew={() => setStep(2)}
+              onRename={handleRenameScript}
+              onBack={handleGoBack}
+            />
+          )}
         </div>
       </div>
       
