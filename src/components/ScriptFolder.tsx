@@ -115,7 +115,7 @@ export default function ScriptFolder({
                             onChange={() => handlePrimaryChange(script.id, script.isPrimary || false)}
                             className="peer hidden"
                           />
-                          <div className="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-[#5b06be10] transition-all duration-300 flex items-center justify-center">
+                         <div className="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-[#5b06be10] transition-all duration-300 flex items-center justify-center">
                             <div 
                               className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${
                                 script.isPrimary 
