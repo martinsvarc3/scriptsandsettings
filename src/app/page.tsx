@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useEffect } from 'react'
 import ScriptUploader from '@/components/ScriptUploader'
 import SetCallTargetsModal from '@/components/SetCallTargetsModal'
@@ -15,20 +16,15 @@ export default function Home() {
     const preloadData = async () => {
       try {
         // Get member data
-        const { teamId, memberstackId } = await getMemberData()
-
+        const { memberstackId } = await getMemberData()
+        
         // Preload scripts
         const scriptsPromises = categories.map(category => 
-          scriptService.getScripts(teamId, memberstackId, category)
+          scriptService.getScripts(memberstackId, category)
         )
         await Promise.all(scriptsPromises)
-
-        // Preload performance goals
-        await fetch(`/api/performance-goals?teamId=${teamId}`)
-
-        // Wait additional 1 second to ensure smooth transition
+        
         await new Promise(resolve => setTimeout(resolve, 1000))
-
         setIsLoading(false)
       } catch (err) {
         console.error('Error preloading:', err)
