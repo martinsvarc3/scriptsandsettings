@@ -12,6 +12,8 @@ export interface SavedScript {
   content: string
   lastEdited: string
   isSelected: boolean
+  isPrimary: boolean
+  category: Category
 }
 
 export interface CategoryData {
@@ -34,4 +36,16 @@ export interface ScriptEditorProps {
   handleGoBack: () => void
   onRename: (scriptId: string, newName: string) => Promise<void>
   onNameUpdate: (newName: string) => void
+}
+
+export interface ScriptFolderProps {
+  category: Category
+  scripts: SavedScript[]
+  onEdit: (script: SavedScript) => void
+  onRemove: (scriptId: string) => void
+  onSelect: (scriptId: string) => void
+  onUploadNew: () => void
+  onRename: (scriptId: string, newName: string) => void
+  onBack: () => void
+  onPrimaryChange: (scriptId: string, isPrimary: boolean) => void
 }
