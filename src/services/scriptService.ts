@@ -12,7 +12,6 @@ interface ScriptUpdateParams {
 export const scriptService = {
   async getScripts(teamId: string, memberstackId: string, category?: Category): Promise<SavedScript[]> {
     const params = new URLSearchParams({
-      teamId,
       memberstackId,
       ...(category && { category })
     });
@@ -39,20 +38,16 @@ export const scriptService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        teamId,
         memberstackId,
         name,
         content,
-        category,
-        isPrimary
+        category
       })
     });
-
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to create script');
     }
-
     return response.json();
   },
 
@@ -66,30 +61,28 @@ export const scriptService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        teamId,
         ...updates
       })
     });
-
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to update script');
     }
-
     return response.json();
   },
 
   async deleteScript(id: string, teamId: string): Promise<{ success: boolean }> {
-    const params = new URLSearchParams({ id, teamId });
+    const params = new URLSearchParams({ 
+      id,
+      memberstackId: teamId // Using teamId as memberstackId for backward compatibility
+    });
     const response = await fetch(`/api/scripts?${params}`, {
       method: 'DELETE'
     });
-
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to delete script');
     }
-
     return response.json();
   },
 
@@ -99,16 +92,8 @@ export const scriptService = {
     category: Category,
     isPrimary: boolean
   ): Promise<SavedScript> {
-    // First, if making a script primary, remove primary status from other scripts in the category
-    if (isPrimary) {
-      await this.updateScript(id, teamId, {
-        category,
-        isPrimary: false
-      });
-    }
-
-    // Then update the target script
     return this.updateScript(id, teamId, {
+      category,
       isPrimary
     });
   }
