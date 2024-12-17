@@ -27,29 +27,36 @@ export const scriptService = {
     return response.json();
   },
 
-  async createScript(
-  memberId: string,  // Changed from teamId
+async createScript(
+  memberId: string,
   memberstackId: string,
   name: string,
   content: string,
   category: Category
 ): Promise<SavedScript> {
+  const payload = {
+    memberstackId,
+    name,
+    content,
+    category
+  };
+  console.log('Sending request to /api/scripts with payload:', payload);
+  
   const response = await fetch('/api/scripts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      memberstackId: memberstackId,
-      name,
-      content,
-      category
-    })
+    body: JSON.stringify(payload)
   });
+
+  const data = await response.json();
+  
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to create script');
+    console.error('API Error Response:', data);
+    throw new Error(data.error || 'Failed to create script');
   }
-  return response.json();
-},
+  
+  return data;
+}
 
   async updateScript(
     id: string,
