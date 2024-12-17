@@ -13,7 +13,6 @@ interface ScriptFolderProps {
   onUploadNew: () => void
   onRename: (scriptId: string, newName: string) => void
   onBack: () => void
-  onPrimaryChange: (scriptId: string, isPrimary: boolean) => void
 }
 
 export default function ScriptFolder({
@@ -25,14 +24,9 @@ export default function ScriptFolder({
   onUploadNew,
   onRename,
   onBack,
-  onPrimaryChange
 }: ScriptFolderProps) {
   const [editingNameId, setEditingNameId] = useState<string | null>(null)
   const [editingText, setEditingText] = useState<string>('')
-
-  const handlePrimaryChange = (scriptId: string, currentValue: boolean) => {
-    onPrimaryChange(scriptId, !currentValue)
-  }
 
   const handleStartEditing = (script: SavedScript) => {
     setEditingText(script.name)
@@ -126,31 +120,6 @@ export default function ScriptFolder({
                     >
                       <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
                     </button>
-                    <div className="flex items-center pl-1">
-                      <label className="inline-flex items-center cursor-pointer group">
-                        <div className="relative">
-                          <input
-                            type="radio"
-                            name={`primary-${category}`}
-                            checked={script.isPrimary}
-                            onChange={() => handlePrimaryChange(script.id, script.isPrimary || false)}
-                            className="peer hidden"
-                          />
-                          <div className="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-[#5b06be10] transition-all duration-300 flex items-center justify-center">
-                            <div 
-                              className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${
-                                script.isPrimary 
-                                  ? 'border-[#5b06be] bg-[#5b06be] scale-100' 
-                                  : 'border-gray-300 bg-white scale-90 group-hover:border-[#5b06be]'
-                              }`}
-                            />
-                          </div>
-                        </div>
-                        <span className="ml-3 text-sm font-montserrat text-gray-600 group-hover:text-[#5b06be] transition-all duration-300">
-                          Make Primary
-                        </span>
-                      </label>
-                    </div>
                   </div>
                 </div>
               </div>
