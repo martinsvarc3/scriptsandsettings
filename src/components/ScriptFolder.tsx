@@ -13,6 +13,7 @@ interface ScriptFolderProps {
   onUploadNew: () => void
   onRename: (scriptId: string, newName: string) => void
   onBack: () => void
+  onPrimaryChange: (scriptId: string, isPrimary: boolean) => void
 }
 
 export default function ScriptFolder({
@@ -23,9 +24,14 @@ export default function ScriptFolder({
   onSelect,
   onUploadNew,
   onRename,
-  onBack
+  onBack,
+  onPrimaryChange
 }: ScriptFolderProps) {
   const [editingNameId, setEditingNameId] = useState<string | null>(null)
+
+  const handlePrimaryChange = (scriptId: string, currentValue: boolean) => {
+    onPrimaryChange(scriptId, !currentValue)
+  }
 
   return (
     <div className="space-y-3">
@@ -92,6 +98,20 @@ export default function ScriptFolder({
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
+                    <div className="flex items-center space-x-2 ml-2">
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          className="form-radio w-4 h-4 text-[#5b06be] border-gray-300 focus:ring-[#5b06be]"
+                          name={`primary-${category}`}
+                          checked={script.isPrimary}
+                          onChange={() => handlePrimaryChange(script.id, script.isPrimary || false)}
+                        />
+                        <span className="ml-2 text-sm font-montserrat text-gray-700">
+                          Make Primary
+                        </span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
