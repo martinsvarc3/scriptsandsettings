@@ -28,29 +28,28 @@ export const scriptService = {
   },
 
   async createScript(
-    teamId: string,
-    memberstackId: string,
-    name: string,
-    content: string,
-    category: Category,
-    isPrimary: boolean = false
-  ): Promise<SavedScript> {
-    const response = await fetch('/api/scripts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        memberstackId,
-        name,
-        content,
-        category
-      })
-    });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to create script');
-    }
-    return response.json();
-  },
+  memberId: string,  // Changed from teamId
+  memberstackId: string,
+  name: string,
+  content: string,
+  category: Category
+): Promise<SavedScript> {
+  const response = await fetch('/api/scripts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      memberstackId: memberstackId,
+      name,
+      content,
+      category
+    })
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to create script');
+  }
+  return response.json();
+},
 
   async updateScript(
     id: string,
