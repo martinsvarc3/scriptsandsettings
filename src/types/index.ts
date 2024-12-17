@@ -11,8 +11,6 @@ export interface SavedScript {
   name: string
   content: string
   lastEdited: string
-  isSelected: boolean
-  isPrimary: boolean
   category: Category
 }
 
