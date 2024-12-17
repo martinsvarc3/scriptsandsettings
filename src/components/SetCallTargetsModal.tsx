@@ -317,7 +317,8 @@ export default function SetCallTargetsModal() {
       />
       <p className="text-[#000000] text-center text-sm sm:text-base font-montserrat font-semibold px-4">
         Start Building Your Team to Use Advanced Functions
-      </p>
+       </p>
     </div>
   </div>
-)
+) 
+} 
