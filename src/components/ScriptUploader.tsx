@@ -373,29 +373,26 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
   }
 
   const handleSelectScript = async (scriptId: string) => {
-    if (!teamId) return
+  if (!memberId || !selectedCategory) return
 
-    try {
-      await scriptService.updateScript(scriptId, teamId, { isSelected: true })
-      setCategoryData(prev => {
-        return prev.map(categoryData => {
-          if (categoryData.category === selectedCategory) {
-            return {
-              ...categoryData,
-              scripts: categoryData.scripts.map(script => ({
-                ...script,
-                isSelected: script.id === scriptId
-              }))
-            }
-          }
-          return categoryData
-        })
-      })
-    } catch (err) {
-      setError('Error selecting script. Please try again.')
-      console.error('Script selection error:', err)
-    }
+  try {
+    await scriptService.updateScript(
+      scriptId, 
+      memberId,
+      {
+        memberstackId: memberId,
+        category: selectedCategory
+      }
+    )
+    // We're just keeping the script in state without any selection status
+    setCategoryData(prev => {
+      return prev.map(categoryData => categoryData)
+    })
+  } catch (err) {
+    setError('Error selecting script. Please try again.')
+    console.error('Script selection error:', err)
   }
+}
 
   if (isLoading && !selectedCategory) {
     return <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
