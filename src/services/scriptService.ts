@@ -8,7 +8,7 @@ interface ScriptUpdateParams {
 }
 
 export const scriptService = {
-  async getScripts(teamId: string, memberstackId: string, category?: Category): Promise<SavedScript[]> {
+  async getScripts(memberstackId: string, category?: Category): Promise<SavedScript[]> {
     const params = new URLSearchParams({
       memberstackId,
       ...(category && { category })
@@ -25,7 +25,6 @@ export const scriptService = {
   },
 
   async createScript(
-    memberId: string,
     memberstackId: string,
     name: string,
     content: string,
