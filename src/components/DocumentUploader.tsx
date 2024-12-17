@@ -127,7 +127,7 @@ export default function DocumentUploader({ onUpload }: DocumentUploaderProps) {
           </div>
         </label>
         <p className="mt-2 text-sm md:text-xs sm:text-xs text-gray-500 font-montserrat">
-          Supported formats: .txt, .pdf, .docx
+          Supported formats: .txt or .docx
         </p>
       </div>
       {error && (
