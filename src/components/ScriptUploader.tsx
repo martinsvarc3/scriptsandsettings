@@ -300,42 +300,6 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
   }
 };
 
-      setCategoryData(prev => {
-        const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
-        if (categoryIndex !== -1) {
-          const newData = [...prev]
-          if (editingScript?.id && editingScript.id.length > 13) {
-            newData[categoryIndex].scripts = newData[categoryIndex].scripts.map(script => 
-              script.id === editingScript.id ? savedScript : script
-            )
-          } else {
-            newData[categoryIndex].scripts = [...newData[categoryIndex].scripts, savedScript]
-          }
-          return newData
-        }
-        return [...prev, {
-          category: selectedCategory,
-          scripts: [savedScript]
-        }]
-      })
-
-      setIsSaved(true)
-      setTimeout(() => {
-        setStep(1)
-        setSelectedCategory(null)
-        setSelectedTemplate(null)
-        setUploadedContent(null)
-        setEditingScript(null)
-        setHistory([1])
-      }, 1500)
-    } catch (err) {
-      setError('Error saving script. Please try again.')
-      console.error('Script saving error:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleGoBack = () => {
     if (history.length > 1) {
       const newHistory = [...history]
@@ -432,35 +396,6 @@ const handleScriptSave = async (content: string, scriptName?: string) => {
       console.error('Script selection error:', err)
     }
   }
-
-const handlePrimaryScript = async (scriptId: string, isPrimary: boolean) => {
-  if (!teamId) return
-
-  try {
-    // Update the script's primary status
-    await scriptService.updateScript(scriptId, teamId, { isPrimary })
-
-    // Update local state
-    setCategoryData(prev => {
-      return prev.map(categoryData => {
-        if (categoryData.category === selectedCategory) {
-          return {
-            ...categoryData,
-            scripts: categoryData.scripts.map(script => ({
-              ...script,
-              // Set the clicked script as primary and remove primary from others
-              isPrimary: script.id === scriptId ? isPrimary : false
-            }))
-          }
-        }
-        return categoryData
-      })
-    })
-  } catch (err) {
-    setError('Error updating primary script. Please try again.')
-    console.error('Primary script update error:', err)
-  }
-}
 
   if (isLoading && !selectedCategory) {
     return <div className="flex items-center justify-center min-h-[200px]">Loading...</div>
