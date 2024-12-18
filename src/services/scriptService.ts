@@ -3,14 +3,13 @@ import { SavedScript, Category } from '@/types';
 interface ScriptUpdateParams {
   name?: string;
   content?: string;
-  memberstackId?: string;
   category?: Category;
 }
 
 export const scriptService = {
-  async getScripts(memberstackId: string, category?: Category): Promise<SavedScript[]> {
+  async getScripts(memberId: string, category?: Category): Promise<SavedScript[]> {
     const params = new URLSearchParams({
-      memberstackId,
+      memberId,
       ...(category && { category })
     });
     
@@ -25,7 +24,7 @@ export const scriptService = {
   },
 
   async createScript(
-    memberstackId: string,
+    memberId: string,
     name: string,
     content: string,
     category: Category
@@ -34,7 +33,7 @@ export const scriptService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        memberstackId,
+        memberId,
         name,
         content,
         category
@@ -50,7 +49,7 @@ export const scriptService = {
 
   async updateScript(
     id: string,
-    memberstackId: string,
+    memberId: string,
     updates: ScriptUpdateParams
   ): Promise<SavedScript> {
     const response = await fetch('/api/scripts', {
@@ -58,7 +57,7 @@ export const scriptService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        memberstackId,
+        memberId,
         ...updates
       })
     });
@@ -70,8 +69,8 @@ export const scriptService = {
     return response.json();
   },
 
-  async deleteScript(id: string, memberstackId: string): Promise<{ success: boolean }> {
-    const params = new URLSearchParams({ id, memberstackId });
+  async deleteScript(id: string, memberId: string): Promise<{ success: boolean }> {
+    const params = new URLSearchParams({ id, memberId });
     const response = await fetch(`/api/scripts?${params}`, {
       method: 'DELETE'
     });
