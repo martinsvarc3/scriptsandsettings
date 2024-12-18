@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
 import Image from 'next/image'
 import { Info } from 'lucide-react'
-import { getMemberData } from "@/utils/memberstack"
 
 interface TargetConfig {
   name: string
@@ -54,31 +53,37 @@ export default function SetCallTargetsModal() {
 useEffect(() => {
   const initializeMemberData = async () => {
     try {
-      const { memberstackId } = await getMemberData()
-      setMemberId(memberstackId)
+      const params = new URLSearchParams(window.location.search);
+      const memberId = params.get('memberId');
       
-      if (memberstackId) {
-        const response = await fetch(`/api/performance-goals?memberstackId=${memberstackId}`)
+      if (!memberId) {
+        throw new Error('No memberId found in URL');
+      }
+      
+      setMemberId(memberId);
+      
+      if (memberId) {
+        const response = await fetch(`/api/performance-goals?memberId=${memberId}`);
         if (response.ok) {
-          const data = await response.json()
+          const data = await response.json();
           if (data) {
             setTargets([
               data.overall_performance_goal.toString(),
               data.number_of_calls_average.toString(),
               data.call_length?.toString() || ""
-            ])
-            setCallExtendAllowed(data.call_extend_allowed ?? true)
+            ]);
+            setCallExtendAllowed(data.call_extend_allowed ?? true);
           }
         }
       }
     } catch (err) {
-      console.error('Member data error:', err)
-      setError('Error loading member data. Please refresh the page.')
+      console.error('Member data error:', err);
+      setError('Error loading member data. Please refresh the page.');
     }
   }
 
-  initializeMemberData()
-}, [])
+  initializeMemberData();
+}, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -92,14 +97,14 @@ useEffect(() => {
   }, [])
 
 const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  e.preventDefault();
   if (!memberId) {
-    setError('Member ID not available. Please refresh the page.')
-    return
+    setError('Member ID not available. Please refresh the page.');
+    return;
   }
 
-  setIsLoading(true)
-  setError(null)
+  setIsLoading(true);
+  setError(null);
 
   try {
     const response = await fetch('/api/performance-goals', {
@@ -108,27 +113,27 @@ const handleSubmit = async (e: React.FormEvent) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        memberstackId: memberId,
+        memberId,  // Changed from memberstackId
         overall_performance_goal: Number(targets[0]),
         number_of_calls_average: Number(targets[1]),
         call_length: Number(targets[2]),
         call_extend_allowed: callExtendAllowed
       })
-    })
+    });
 
     if (!response.ok) {
-      throw new Error('Failed to save targets')
+      throw new Error('Failed to save targets');
     }
 
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   } catch (err) {
-    console.error('Error saving targets:', err)
-    setError('Failed to save targets. Please try again.')
+    console.error('Error saving targets:', err);
+    setError('Failed to save targets. Please try again.');
   } finally {
-    setIsLoading(false)
+    setIsLoading(false);
   }
-}
+};
 
   const getGradientColor = (value: number): string => {
     if (value < 50) return 'from-[#50c2aa] to-[#50c2aa]'
