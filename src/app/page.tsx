@@ -4,23 +4,25 @@ import { useState, useEffect } from 'react'
 import ScriptUploader from '@/components/ScriptUploader'
 import SetCallTargetsModal from '@/components/SetCallTargetsModal'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import { getMemberData } from "@/utils/memberstack"
 import { scriptService } from '@/services/scriptService'
 import { categories } from '@/components/CategorySelector'
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
-  const [preloadedData, setPreloadedData] = useState(null)
 
   useEffect(() => {
     const preloadData = async () => {
       try {
-        // Get member data
-        const { memberstackId } = await getMemberData()
+        const params = new URLSearchParams(window.location.search);
+        const memberId = params.get('memberId');
         
-        // Preload scripts
+        if (!memberId) {
+          console.error('No memberId found in URL');
+          return;
+        }
+
         const scriptsPromises = categories.map(category => 
-          scriptService.getScripts(memberstackId, category)
+          scriptService.getScripts(memberId, category)
         )
         await Promise.all(scriptsPromises)
         
@@ -28,7 +30,6 @@ export default function Home() {
         setIsLoading(false)
       } catch (err) {
         console.error('Error preloading:', err)
-        // Still hide loader after 2 seconds even if there's an error
         setTimeout(() => setIsLoading(false), 2000)
       }
     }
