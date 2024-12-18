@@ -12,7 +12,6 @@ import ScriptFolder from '@/components/ScriptFolder'
 import { Category, Template, SavedScript, CategoryData } from '@/types'
 import { Check, AlertCircle } from 'lucide-react'
 import { scriptService } from '@/services/scriptService'
-import { getMemberData } from '@/utils/memberstack'
 import { categories } from '@/components/CategorySelector'
 
 export default function ScriptUploader() {
@@ -39,8 +38,14 @@ export default function ScriptUploader() {
   useEffect(() => {
     const initializeMemberData = async () => {
       try {
-        const { memberstackId } = await getMemberData()
-        setMemberId(memberstackId)
+        const params = new URLSearchParams(window.location.search)
+        const memberId = params.get('memberId')
+        
+        if (!memberId) {
+          throw new Error('No memberId found in URL')
+        }
+        
+        setMemberId(memberId)
       } catch (err) {
         setError('Error loading member data. Please refresh the page.')
         console.error('Member data error:', err)
@@ -211,44 +216,27 @@ const handleCategorySelect = async (category: Category) => {
   }
 
   const handleScriptSave = async (content: string, scriptName?: string) => {
-    console.log('Starting save attempt with:', { 
-      memberId, 
-      selectedCategory,
-      hasEditingScript: !!editingScript,
-      scriptName 
-    })
-    
     if (!memberId || !selectedCategory) {
-      console.error('Missing required fields:', { memberId, selectedCategory })
       setError('Unable to save script. Please try again.')
       return
     }
 
     setIsLoading(true)
-    
     try {
       const finalScriptName = scriptName || selectedTemplate?.title || editingScript?.name || 'New Script'
       let savedScript
 
       if (editingScript?.id && editingScript.id.length > 13) {
-        console.log('Updating existing script:', editingScript.id)
         savedScript = await scriptService.updateScript(
           editingScript.id,
           memberId,
           {
             name: finalScriptName,
             content: content,
-            memberstackId: memberId,
             category: selectedCategory
           }
         )
       } else {
-        console.log('Creating new script with:', {
-          memberId,
-          name: finalScriptName,
-          category: selectedCategory
-        })
-        
         savedScript = await scriptService.createScript(
           memberId,
           finalScriptName,
@@ -256,8 +244,6 @@ const handleCategorySelect = async (category: Category) => {
           selectedCategory
         )
       }
-
-      console.log('Script saved successfully:', savedScript)
 
       setCategoryData(prev => {
         const categoryIndex = prev.findIndex(data => data.category === selectedCategory)
@@ -295,7 +281,7 @@ const handleCategorySelect = async (category: Category) => {
     }
   }
 
-  const handleGoBack = () => {
+const handleGoBack = () => {
     if (history.length > 1) {
       const newHistory = [...history]
       newHistory.pop()
@@ -347,14 +333,7 @@ const handleCategorySelect = async (category: Category) => {
     if (!memberId) return
 
     try {
-      const updatedScript = await scriptService.updateScript(
-        scriptId,
-        memberId,
-        {
-          name: newName,
-          memberstackId: memberId
-        }
-      )
+      const updatedScript = await scriptService.updateScript(scriptId, memberId, { name: newName })
       setCategoryData(prev => {
         return prev.map(categoryData => {
           if (categoryData.category === selectedCategory) {
@@ -378,17 +357,8 @@ const handleCategorySelect = async (category: Category) => {
     if (!memberId || !selectedCategory) return
 
     try {
-      await scriptService.updateScript(
-        scriptId, 
-        memberId,
-        {
-          memberstackId: memberId,
-          category: selectedCategory
-        }
-      )
-      setCategoryData(prev => {
-        return prev.map(categoryData => categoryData)
-      })
+      await scriptService.updateScript(scriptId, memberId, { category: selectedCategory })
+      setCategoryData(prev => prev.map(categoryData => categoryData))
     } catch (err) {
       setError('Error selecting script. Please try again.')
       console.error('Script selection error:', err)
