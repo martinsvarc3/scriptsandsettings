@@ -29,12 +29,29 @@ export const scriptService = {
     content: string,
     category: Category
   ): Promise<SavedScript> {
-    console.log('Creating script with data:', { memberId, name, content, category });
+    // Get the memberId from URL as fallback
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlMemberId = urlParams.get('memberId');
+    
+    // Use provided memberId or fallback to URL memberId
+    const finalMemberId = memberId || urlMemberId;
+    
+    if (!finalMemberId) {
+      throw new Error('Member ID is required');
+    }
+
+    console.log('Creating script with data:', { 
+      memberId: finalMemberId, 
+      name, 
+      contentLength: content?.length,
+      category 
+    });
+
     const response = await fetch('/api/scripts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        memberId,
+        memberId: finalMemberId,
         name,
         content,
         category
@@ -45,6 +62,7 @@ export const scriptService = {
       const error = await response.json();
       throw new Error(error.message || 'Failed to create script');
     }
+
     return response.json();
   },
 
@@ -53,12 +71,23 @@ export const scriptService = {
     memberId: string,
     updates: ScriptUpdateParams
   ): Promise<SavedScript> {
+    // Get the memberId from URL as fallback
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlMemberId = urlParams.get('memberId');
+    
+    // Use provided memberId or fallback to URL memberId
+    const finalMemberId = memberId || urlMemberId;
+    
+    if (!finalMemberId) {
+      throw new Error('Member ID is required');
+    }
+
     const response = await fetch('/api/scripts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        memberId,
+        memberId: finalMemberId,
         ...updates
       })
     });
@@ -67,11 +96,27 @@ export const scriptService = {
       const error = await response.json();
       throw new Error(error.message || 'Failed to update script');
     }
+
     return response.json();
   },
 
   async deleteScript(id: string, memberId: string): Promise<{ success: boolean }> {
-    const params = new URLSearchParams({ id, memberId });
+    // Get the memberId from URL as fallback
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlMemberId = urlParams.get('memberId');
+    
+    // Use provided memberId or fallback to URL memberId
+    const finalMemberId = memberId || urlMemberId;
+    
+    if (!finalMemberId) {
+      throw new Error('Member ID is required');
+    }
+
+    const params = new URLSearchParams({ 
+      id, 
+      memberId: finalMemberId 
+    });
+
     const response = await fetch(`/api/scripts?${params}`, {
       method: 'DELETE'
     });
@@ -80,6 +125,7 @@ export const scriptService = {
       const error = await response.json();
       throw new Error(error.message || 'Failed to delete script');
     }
+
     return response.json();
   }
 };
