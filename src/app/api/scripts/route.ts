@@ -55,14 +55,20 @@ export async function GET(request: Request) {
       updatedAt: row.updated_at
     })));
   } catch (error) {
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      cause: error.cause
-    });
+    console.error('Error loading scripts:', error);
+    
+    // Type safe error logging
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        cause: error.cause
+      });
+    }
+    
     return NextResponse.json({ 
       error: 'Failed to load scripts',
-      details: error.message
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }
