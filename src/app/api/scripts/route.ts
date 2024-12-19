@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     }
 
     const pool = createPool({
-      connectionString: process.env.POSTGRES_URL
+      connectionString: process.env.visionboard_PRISMA_URL
     });
 
     console.log('Executing INSERT query with values:', {
