@@ -79,10 +79,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Check both URL params and body for memberId
+    const { searchParams } = new URL(request.url);
+    const urlMemberId = searchParams.get('memberId');
+    
     const body = await request.json();
     console.log('POST request body:', body);
     
-    const { memberId, name, content, category } = body;
+    const { memberId: bodyMemberId, name, content, category } = body;
+    
+    // Use URL memberId if available, otherwise use body memberId
+    const memberId = urlMemberId || bodyMemberId;
+    
     console.log('Destructured values:', { memberId, name, content, category });
     
     if (!validateMemberId(memberId) || !content || !category) {
