@@ -158,24 +158,42 @@ export async function PUT(request: Request) {
       connectionString: process.env.visionboard_PRISMA_URL
     });
 
-    const updateParts = [];
+    // Build the update query dynamically
+    let updateQuery = ['UPDATE scripts_of_users SET'];
     const updateValues = [];
+    const conditions = [];
 
-    if (name !== undefined) updateParts.push('name = ${name}');
-    if (content !== undefined) updateParts.push('content = ${content}');
-    if (category !== undefined) updateParts.push('category = ${category}');
-    updateParts.push('last_edited = CURRENT_TIMESTAMP', 'updated_at = CURRENT_TIMESTAMP');
+    if (name !== undefined) {
+      conditions.push('name = $1');
+      updateValues.push(name);
+    }
+    if (content !== undefined) {
+      conditions.push(`content = $${updateValues.length + 1}`);
+      updateValues.push(content);
+    }
+    if (category !== undefined) {
+      conditions.push(`category = $${updateValues.length + 1}`);
+      updateValues.push(category);
+    }
 
-    if (updateParts.length === 2) { // Only timestamps are being updated
+    // Always update timestamps
+    conditions.push('last_edited = CURRENT_TIMESTAMP', 'updated_at = CURRENT_TIMESTAMP');
+
+    if (conditions.length === 2) { // Only timestamps are being updated
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
-    const { rows } = await pool.sql`
-      UPDATE scripts_of_users 
-      SET ${pool.sql(updateParts.join(', '))}
-      WHERE id = ${id} AND memberstack_id = ${memberId}
-      RETURNING *
-    `;
+    updateQuery.push(conditions.join(', '));
+    updateQuery.push(`WHERE id = $${updateValues.length + 1} AND memberstack_id = $${updateValues.length + 2}`);
+    updateQuery.push('RETURNING *');
+
+    // Add the WHERE clause values
+    updateValues.push(id, memberId);
+
+    const { rows } = await pool.query(
+      updateQuery.join(' '),
+      updateValues
+    );
 
     if (rows.length === 0) {
       return NextResponse.json({ error: 'Script not found' }, { status: 404 });
