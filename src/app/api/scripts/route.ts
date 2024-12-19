@@ -7,6 +7,8 @@ export async function GET(request: Request) {
     const memberId = searchParams.get('memberId');
     const category = searchParams.get('category');
     
+    console.log('GET request params:', { memberId, category });
+
     if (!memberId) {
       return NextResponse.json({ error: 'Member ID required' }, { status: 400 });
     }
@@ -15,19 +17,35 @@ export async function GET(request: Request) {
       connectionString: process.env.visionboard_PRISMA_URL
     });
 
-    let query = 'SELECT * FROM scripts_of_users WHERE memberstack_id = $1';
-    const params = [memberId];
-
-    if (category) {
-      query += ' AND category = $2';
-      params.push(category);
+    try {
+      await pool.sql`SELECT 1`;
+      console.log('Database connection successful');
+    } catch (connectionError) {
+      console.error('Database connection error:', connectionError);
+      return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
     }
 
-    query += ' ORDER BY updated_at DESC';
+    let result;
+    if (category) {
+      console.log('Executing query with category');
+      result = await pool.sql`
+        SELECT * FROM scripts_of_users 
+        WHERE memberstack_id = ${memberId} 
+        AND category = ${category}
+        ORDER BY updated_at DESC
+      `;
+    } else {
+      console.log('Executing query without category');
+      result = await pool.sql`
+        SELECT * FROM scripts_of_users 
+        WHERE memberstack_id = ${memberId}
+        ORDER BY updated_at DESC
+      `;
+    }
 
-    const { rows } = await pool.query(query, params);
+    console.log(`Found ${result.rows.length} scripts`);
 
-    return NextResponse.json(rows.map(row => ({
+    return NextResponse.json(result.rows.map(row => ({
       id: row.id,
       name: row.name,
       content: row.content,
@@ -37,8 +55,15 @@ export async function GET(request: Request) {
       updatedAt: row.updated_at
     })));
   } catch (error) {
-    console.error('Error loading scripts:', error);
-    return NextResponse.json({ error: 'Failed to load scripts' }, { status: 500 });
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause
+    });
+    return NextResponse.json({ 
+      error: 'Failed to load scripts',
+      details: error.message
+    }, { status: 500 });
   }
 }
 
