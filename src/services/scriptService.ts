@@ -29,29 +29,21 @@ export const scriptService = {
     content: string,
     category: Category
   ): Promise<SavedScript> {
-    // Get the memberId from URL as fallback
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlMemberId = urlParams.get('memberId');
+    // Include memberId in both URL and body
+    const params = new URLSearchParams({ memberId });
     
-    // Use provided memberId or fallback to URL memberId
-    const finalMemberId = memberId || urlMemberId;
-    
-    if (!finalMemberId) {
-      throw new Error('Member ID is required');
-    }
-
     console.log('Creating script with data:', { 
-      memberId: finalMemberId, 
+      memberId, 
       name, 
       contentLength: content?.length,
       category 
     });
 
-    const response = await fetch('/api/scripts', {
+    const response = await fetch(`/api/scripts?${params}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        memberId: finalMemberId,
+        memberId,
         name,
         content,
         category
@@ -71,23 +63,15 @@ export const scriptService = {
     memberId: string,
     updates: ScriptUpdateParams
   ): Promise<SavedScript> {
-    // Get the memberId from URL as fallback
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlMemberId = urlParams.get('memberId');
-    
-    // Use provided memberId or fallback to URL memberId
-    const finalMemberId = memberId || urlMemberId;
-    
-    if (!finalMemberId) {
-      throw new Error('Member ID is required');
-    }
+    // Include memberId in both URL and body
+    const params = new URLSearchParams({ memberId });
 
-    const response = await fetch('/api/scripts', {
+    const response = await fetch(`/api/scripts?${params}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id,
-        memberId: finalMemberId,
+        memberId,
         ...updates
       })
     });
@@ -101,21 +85,7 @@ export const scriptService = {
   },
 
   async deleteScript(id: string, memberId: string): Promise<{ success: boolean }> {
-    // Get the memberId from URL as fallback
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlMemberId = urlParams.get('memberId');
-    
-    // Use provided memberId or fallback to URL memberId
-    const finalMemberId = memberId || urlMemberId;
-    
-    if (!finalMemberId) {
-      throw new Error('Member ID is required');
-    }
-
-    const params = new URLSearchParams({ 
-      id, 
-      memberId: finalMemberId 
-    });
+    const params = new URLSearchParams({ id, memberId });
 
     const response = await fetch(`/api/scripts?${params}`, {
       method: 'DELETE'
