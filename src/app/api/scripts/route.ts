@@ -1,6 +1,11 @@
 import { createPool } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
+// Helper function to validate member ID
+const validateMemberId = (memberId: string | null): boolean => {
+  return Boolean(memberId && memberId.trim().length > 0);
+};
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -9,7 +14,7 @@ export async function GET(request: Request) {
     
     console.log('GET request params:', { memberId, category });
 
-    if (!memberId) {
+    if (!validateMemberId(memberId)) {
       return NextResponse.json({ error: 'Member ID required' }, { status: 400 });
     }
 
@@ -57,7 +62,6 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error loading scripts:', error);
     
-    // Type safe error logging
     if (error instanceof Error) {
       console.error('Error details:', {
         message: error.message,
@@ -77,11 +81,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log('POST request body:', body);
-    const { memberId, name, content, category } = body;
     
+    const { memberId, name, content, category } = body;
     console.log('Destructured values:', { memberId, name, content, category });
     
-    if (!memberId || !content || !category) {
+    if (!validateMemberId(memberId) || !content || !category) {
       return NextResponse.json({ 
         error: 'Missing required fields', 
         received: { memberId, content, category }
@@ -140,33 +144,36 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
+    console.log('PUT request body:', body);
     const { id, memberId, name, content, category } = body;
 
-    if (!id || !memberId) {
-      return NextResponse.json({ error: 'ID and Member ID required' }, { status: 400 });
+    if (!id || !validateMemberId(memberId)) {
+      return NextResponse.json({ 
+        error: 'ID and Member ID required',
+        received: { id, memberId }
+      }, { status: 400 });
     }
 
     const pool = createPool({
       connectionString: process.env.visionboard_PRISMA_URL
     });
 
-    const updateFields = [];
-    const values = [memberId, id];
+    const updateParts = [];
+    const updateValues = [];
 
-    if (name) updateFields.push(`name = ${name}`);
-    if (content) updateFields.push(`content = ${content}`);
-    if (category) updateFields.push(`category = ${category}`);
+    if (name !== undefined) updateParts.push('name = ${name}');
+    if (content !== undefined) updateParts.push('content = ${content}');
+    if (category !== undefined) updateParts.push('category = ${category}');
+    updateParts.push('last_edited = CURRENT_TIMESTAMP', 'updated_at = CURRENT_TIMESTAMP');
 
-    if (updateFields.length === 0) {
+    if (updateParts.length === 2) { // Only timestamps are being updated
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
     const { rows } = await pool.sql`
       UPDATE scripts_of_users 
-      SET ${updateFields.join(', ')}, 
-          last_edited = CURRENT_TIMESTAMP, 
-          updated_at = CURRENT_TIMESTAMP
-      WHERE memberstack_id = ${memberId} AND id = ${id}
+      SET ${pool.sql(updateParts.join(', '))}
+      WHERE id = ${id} AND memberstack_id = ${memberId}
       RETURNING *
     `;
 
@@ -185,7 +192,10 @@ export async function PUT(request: Request) {
     });
   } catch (error) {
     console.error('Error updating script:', error);
-    return NextResponse.json({ error: 'Failed to update script' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to update script',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
@@ -195,8 +205,13 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id');
     const memberId = searchParams.get('memberId');
     
-    if (!id || !memberId) {
-      return NextResponse.json({ error: 'ID and Member ID required' }, { status: 400 });
+    console.log('DELETE request params:', { id, memberId });
+
+    if (!id || !validateMemberId(memberId)) {
+      return NextResponse.json({ 
+        error: 'ID and Member ID required',
+        received: { id, memberId }
+      }, { status: 400 });
     }
 
     const pool = createPool({
@@ -216,6 +231,9 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting script:', error);
-    return NextResponse.json({ error: 'Failed to delete script' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to delete script',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
