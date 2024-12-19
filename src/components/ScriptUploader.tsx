@@ -40,6 +40,7 @@ export default function ScriptUploader() {
       try {
         const params = new URLSearchParams(window.location.search)
         const memberId = params.get('memberId')
+        console.log('Initializing with memberId:', memberId);
         
         if (!memberId) {
           throw new Error('No memberId found in URL')
