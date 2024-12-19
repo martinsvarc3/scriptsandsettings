@@ -29,6 +29,7 @@ export const scriptService = {
     content: string,
     category: Category
   ): Promise<SavedScript> {
+    console.log('Creating script with data:', { memberId, name, content, category });
     const response = await fetch('/api/scripts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
