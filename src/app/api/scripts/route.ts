@@ -74,40 +74,67 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { memberId, name, content, category } = body;
-    
-    if (!memberId || !content || !category) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+ try {
+   const body = await request.json();
+   console.log('POST request body:', body);
+   const { memberId, name, content, category } = body;
+   
+   console.log('Destructured values:', { memberId, name, content, category });
+   
+   if (!memberId || !content || !category) {
+     return NextResponse.json({ 
+       error: 'Missing required fields', 
+       received: { memberId, content, category }
+     }, { status: 400 });
+   }
 
-    const pool = createPool({
-      connectionString: process.env.visionboard_PRISMA_URL
-    });
+   const pool = createPool({
+     connectionString: process.env.POSTGRES_URL
+   });
 
-    const { rows } = await pool.sql`
-      INSERT INTO scripts_of_users 
-      (memberstack_id, name, content, category, last_edited, created_at, updated_at)
-      VALUES 
-      (${memberId}, ${name || 'Untitled Script'}, ${content}, ${category}, 
-       CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      RETURNING *
-    `;
+   console.log('Executing INSERT query with values:', {
+     memberId,
+     name: name || 'Untitled Script',
+     contentLength: content?.length,
+     category
+   });
 
-    return NextResponse.json({
-      id: rows[0].id,
-      name: rows[0].name,
-      content: rows[0].content,
-      lastEdited: rows[0].last_edited,
-      category: rows[0].category,
-      createdAt: rows[0].created_at,
-      updatedAt: rows[0].updated_at
-    });
-  } catch (error) {
-    console.error('Error saving script:', error);
-    return NextResponse.json({ error: 'Failed to save script' }, { status: 500 });
-  }
+   const { rows } = await pool.sql`
+     INSERT INTO scripts_of_users 
+     (memberstack_id, name, content, category, last_edited, created_at, updated_at)
+     VALUES 
+     (${memberId}, ${name || 'Untitled Script'}, ${content}, ${category}, 
+      CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+     RETURNING *
+   `;
+
+   console.log('Insert successful, returning row:', rows[0]);
+
+   return NextResponse.json({
+     id: rows[0].id,
+     name: rows[0].name,
+     content: rows[0].content,
+     lastEdited: rows[0].last_edited,
+     category: rows[0].category,
+     createdAt: rows[0].created_at,
+     updatedAt: rows[0].updated_at
+   });
+ } catch (error) {
+   console.error('Error saving script:', error);
+   
+   if (error instanceof Error) {
+     console.error('Error details:', {
+       message: error.message,
+       stack: error.stack,
+       cause: error.cause
+     });
+   }
+   
+   return NextResponse.json({ 
+     error: 'Failed to save script',
+     details: error instanceof Error ? error.message : 'Unknown error'
+   }, { status: 500 });
+ }
 }
 
 export async function PUT(request: Request) {
